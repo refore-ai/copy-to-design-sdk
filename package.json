@@ -35,6 +35,11 @@
     "access": "public",
     "registry": "https://registry.npmjs.org"
   },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
   "dependencies": {
     "crypto-js": "^4.2.0",
     "nanoid": "^5.1.5",
