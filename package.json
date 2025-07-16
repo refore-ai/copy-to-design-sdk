@@ -1,0 +1,67 @@
+{
+  "name": "@refore/copy-to-design-sdk",
+  "type": "module",
+  "version": "0.0.0",
+  "packageManager": "pnpm@10.13.1+sha512.37ebf1a5c7a30d5fabe0c5df44ee8da4c965ca0c5af3dbab28c3a1681b70a256218d05c81c9c0dcf767ef6b8551eb5b960042b9ed4300c59242336377e01cfad",
+  "module": "./index.js",
+  "types": "./index.d.ts",
+  "description": "Copy the HTML source and import it into the design platform via the plugin.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/refore-ai/copy-to-design-sdk.git"
+  },
+  "keywords": [
+    "copy-to-design",
+    "design",
+    "refore",
+    "figma",
+    "mastergo",
+    "pixso",
+    "jsdesign"
+  ],
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "prepare": "is-ci || husky",
+    "build": "tsdown",
+    "cm": "cz",
+    "lint": "eslint src",
+    "release": "semantic-release"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "dependencies": {
+    "crypto-js": "^4.2.0",
+    "nanoid": "^5.1.5",
+    "ofetch": "^1.4.1"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^4.17.0",
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/npm": "^12.0.1",
+    "@semantic-release/release-notes-generator": "^14.0.3",
+    "@types/crypto-js": "^4.2.2",
+    "commitizen": "^4.3.1",
+    "cz-conventional-changelog": "^3.3.0",
+    "eslint": "^9.31.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.5.1",
+    "husky": "^9.1.7",
+    "is-ci": "^4.1.0",
+    "lint-staged": "^16.1.2",
+    "prettier": "^3.6.2",
+    "semantic-release": "^24.2.3",
+    "tsdown": "^0.12.9",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3"
+  }
+}
