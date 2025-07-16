@@ -89,9 +89,6 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-# Compiled code
-lib/
-
 .test
 
 .roo
