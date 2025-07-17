@@ -29,7 +29,8 @@
     "build": "tsdown",
     "cm": "cz",
     "lint": "eslint src",
-    "release": "semantic-release"
+    "prepublishOnly": "pnpm run build",
+    "release": "semantic-release --no-ci"
   },
   "publishConfig": {
     "access": "public",
