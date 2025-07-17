@@ -1,3 +1,8 @@
+## <small>1.0.1 (2025-07-17)</small>
+
+* fix(package.json): module and types field value error ([9b85246](https://github.com/refore-ai/copy-to-design-sdk/commit/9b85246))
+* chore: use .env save secret information ([d0c04e6](https://github.com/refore-ai/copy-to-design-sdk/commit/d0c04e6))
+
 ## 1.0.0 (2025-07-17)
 
 * chore: add vue example ([fe9a816](https://github.com/refore-ai/copy-to-design-sdk/commit/fe9a816))
