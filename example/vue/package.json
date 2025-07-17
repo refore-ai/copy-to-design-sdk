@@ -21,6 +21,7 @@
     "sass": "^1.89.2",
     "shadcn-vue": "^2.2.0",
     "tailwindcss": "^4.1.11",
-    "vite": "^7.0.4"
+    "vite": "^7.0.4",
+    "vite-tsconfig-paths": "^5.1.4"
   }
 }

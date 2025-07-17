@@ -9,6 +9,7 @@
       "@refore/copy-to-design-sdk": ["../../src/index.ts"],
       "@/*": ["./src/*"],
     },
+    "allowJs": true,
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
