@@ -6,10 +6,7 @@ import { Button } from './components/ui/button';
 
 const copyToDesign = new CopyToDesign({
   key: '0oZEtGQjooLcfXrDFhObo_EqNQFWZSsv',
-  // only for lib development
-  dev: {
-    endpoint: () => 'http://localhost:3333',
-  },
+  _endpoint: () => 'http://localhost:3333',
 });
 
 const input = ref(`<!DOCTYPE html>

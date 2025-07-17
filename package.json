@@ -27,7 +27,6 @@
   "scripts": {
     "prepare": "is-ci || husky",
     "build": "tsdown",
-    "dev:vue": "cd example/vue && vite",
     "cm": "cz",
     "lint": "eslint src",
     "release": "semantic-release"

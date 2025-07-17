@@ -16,13 +16,10 @@ export interface ICopyToClipboardFromHTMLOptions {
   platform: PlatformType;
 }
 
-interface DevOptions {
-  endpoint: (platform: PlatformType) => string;
-}
-
 export interface CopyToDesignOptions {
   key: string;
-  dev?: DevOptions;
+  /** For internal development use only */
+  _endpoint?: (platform: PlatformType) => string;
 }
 
 const $fetch = createFetch({
@@ -54,7 +51,7 @@ export class CopyToDesign {
   constructor(private options: CopyToDesignOptions) {}
 
   private getEndpointByPlatform(platform: PlatformType) {
-    const getEndPoint = this.options.dev?.endpoint ?? DEFAULT_GET_ENDPOINT;
+    const getEndPoint = this.options?._endpoint ?? DEFAULT_GET_ENDPOINT;
     return getEndPoint(platform);
   }
 
