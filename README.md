@@ -20,7 +20,7 @@ pnpm install @refore/copy-to-design-sdk
 ## Usage
 
 ```typescript
-import { CopyToDesign } from '@refore/copy-to-design-sdk';
+import { CopyToDesign, PlatformType } from '@refore/copy-to-design-sdk';
 
 const copyToDesign = new CopyToDesign({
   key: '<YOUR_KEY>',
@@ -48,6 +48,7 @@ const html = `<!DOCTYPE html>
 await copyToDesign.copyToClipboardFromHTML(html, {
   width: 1920,
   height: 1080,
+  platform: PlatformType.Figma,
 });
 
 alert('Copy successful. You can now paste it into the plugin.');
