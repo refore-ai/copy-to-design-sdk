@@ -71,7 +71,7 @@ export class CopyToDesign {
 
     const endpoint = this.getEndpointByPlatform(platform);
 
-    const source = JSON.stringify({ html, height, width, endpoint });
+    const source = JSON.stringify({ type: 'html', html, height, width, endpoint });
     const secret = nanoid(32);
     const encrypted = CryptoJS.AES.encrypt(source, secret);
 
