@@ -5,8 +5,10 @@ import { Textarea } from './components/ui/textarea';
 import { Button } from './components/ui/button';
 
 const copyToDesign = new CopyToDesign({
-  key: '0oZEtGQjooLcfXrDFhObo_EqNQFWZSsv',
-  _endpoint: () => 'http://localhost:3333',
+  key: import.meta.env.VITE_COPY_TO_DESIGN_KEY,
+  _endpoint: import.meta.env.VITE_COPY_TO_DESIGN_ENDPOINT
+    ? () => import.meta.env.VITE_COPY_TO_DESIGN_ENDPOINT
+    : undefined,
 });
 
 const input = ref(`<!DOCTYPE html>
