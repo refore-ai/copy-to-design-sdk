@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
+import { PlatformType } from '@refore/copy-to-design-sdk';
 
 import SuccessAnimation from '../animation/SuccessAnimation.vue';
 import type { ButtonOption } from '../selectable-button/types';
@@ -20,7 +21,9 @@ const emit = defineEmits<{
 const open = defineModel<boolean>('open');
 
 const API_KEY = import.meta.env.VITE_COPY_TO_DESIGN_KEY;
-const API_ENDPOINT = import.meta.env.VITE_COPY_TO_DESIGN_ENDPOINT;
+const API_ENDPOINT = import.meta.env.VITE_COPY_TO_DESIGN_ENDPOINT
+  ? () => import.meta.env.VITE_COPY_TO_DESIGN_ENDPOINT
+  : undefined;
 
 const isExporting = ref(false);
 const exportResult = ref<'success' | 'error' | null>(null);
@@ -47,22 +50,22 @@ const handleExport = async () => {
   exportResult.value = null;
 
   try {
-    const { CopyToDesign, PlatformType: SDKPlatformType } = await import('@refore/copy-to-design-sdk');
+    const { CopyToDesign } = await import('@refore/copy-to-design-sdk');
 
     const copyToDesign = new CopyToDesign({
       key: API_KEY,
-      _endpoint: () => API_ENDPOINT,
+      _endpoint: API_ENDPOINT,
     });
 
     // Map our platform ID to SDK platform type
     const platformMapping = {
-      Figma: SDKPlatformType.Figma,
-      MasterGo: SDKPlatformType.MasterGo,
-      JSDesign: SDKPlatformType.JSDesign,
-      Pixso: SDKPlatformType.PixsoChina,
+      Figma: PlatformType.Figma,
+      MasterGo: PlatformType.MasterGo,
+      JSDesign: PlatformType.JSDesign,
+      Pixso: PlatformType.PixsoChina,
     };
 
-    const platform = platformMapping[props.selectedOption.id as keyof typeof platformMapping] || SDKPlatformType.Figma;
+    const platform = platformMapping[props.selectedOption.id as keyof typeof platformMapping] || PlatformType.Figma;
 
     await copyToDesign.copyToClipboardFromHTML(props.exportContent.html, {
       width: props.exportContent.width || 1920,
