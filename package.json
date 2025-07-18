@@ -30,7 +30,9 @@
     "cm": "cz",
     "lint": "eslint src",
     "prepublishOnly": "pnpm run build",
-    "release": "semantic-release --no-ci"
+    "release": "semantic-release --no-ci",
+    "vue": "pnpm --filter vue-example dev",
+    "vue:i": "pnpm --filter vue-example install"
   },
   "publishConfig": {
     "access": "public",
