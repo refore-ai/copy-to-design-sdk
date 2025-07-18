@@ -6,7 +6,6 @@ import SuccessAnimation from '../animation/SuccessAnimation.vue';
 import type { ButtonOption } from '../selectable-button/types';
 import { Dialog, DialogContent } from '../ui/dialog';
 import type { ExportContent } from './type';
-import { Button } from '../ui/button';
 import { DESIGN_APPS } from './type';
 import { Button } from '../ui/button';
 
