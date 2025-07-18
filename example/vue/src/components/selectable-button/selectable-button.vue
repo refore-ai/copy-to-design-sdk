@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ChevronDown } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
+
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -72,13 +73,9 @@ const dropdownStyle = computed(() => {
 
   const longestTitle = [...allExportOptions.value].sort((a, b) => b.title.length - a.title.length)[0]?.title || '';
 
-  const width = Math.max(longestTitle.length * 8 + 40, 120);
-  const totalWidth = width + 32;
-
-  return {
-    '--reka-dropdown-menu-content-width': `${totalWidth}px`,
-    '--reka-dropdown-menu-trigger-width': `${width}px`,
-  };
+  const buttonWidth = Math.max(longestTitle.length * 8 + 40, 120);
+  const totalWidth = buttonWidth + 24;
+  return { width: `${totalWidth}px` };
 });
 </script>
 
@@ -119,29 +116,24 @@ const dropdownStyle = computed(() => {
       <!-- Dropdown Content -->
       <DropdownMenuContent
         v-if="showDropdown && availableDropdownOptions.length > 0"
-        class="p-1 dropdown-content"
-        :style="dropdownStyle"
+        class="p-1"
         align="end"
         side="bottom"
       >
-        <DropdownMenuItem
-          v-for="option in availableDropdownOptions"
-          :key="option.id"
-          class="h-7 rounded-none px-2 text-xs font-normal hover:bg-gray-50"
-          @click="() => handleSelect(option)"
-        >
-          <div class="flex w-full items-center gap-1.5">
-            <img :src="option.icon" class="h-4 w-4" alt="" />
-            <span class="text-gray-900">{{ option.title }}</span>
-          </div>
-        </DropdownMenuItem>
+        <div :style="dropdownStyle">
+          <DropdownMenuItem
+            v-for="option in availableDropdownOptions"
+            :key="option.id"
+            class="h-7 rounded-none px-2 text-xs font-normal hover:bg-gray-50"
+            @click="() => handleSelect(option)"
+          >
+            <div class="flex w-full items-center gap-1.5">
+              <img :src="option.icon" class="h-4 w-4" alt="" />
+              <span class="text-gray-900">{{ option.title }}</span>
+            </div>
+          </DropdownMenuItem>
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   </div>
 </template>
-
-<style>
-.dropdown-content {
-  min-width: var(--reka-dropdown-menu-content-width);
-}
-</style>
