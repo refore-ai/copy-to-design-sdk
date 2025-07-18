@@ -68,7 +68,7 @@ export class CopyToDesign {
 
     const endpoint = this.getEndpointByPlatform(platform);
 
-    const source = JSON.stringify({ type: 'html', html, height, width, endpoint });
+    const source = JSON.stringify({ type: 'html', html, height, width });
     const secret = nanoid(32);
     const encrypted = CryptoJS.AES.encrypt(source, secret);
 
@@ -83,6 +83,7 @@ export class CopyToDesign {
 
     const div = document.createElement('refore-copy-to-design');
     div.setAttribute('data-copy-id', res.copyId);
+    div.setAttribute('data-copy-endpoint', endpoint);
     div.setAttribute('data-copy-content', encrypted.toString());
 
     const data = new ClipboardItem({
