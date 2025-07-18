@@ -1,15 +1,30 @@
 # @refore/copy-to-design-sdk
 
-Copy the HTML source and import it into the design platform via the plugin.
+Import HTML pages into design tools like Figma via copy and paste.
+
+![](./assets/example-screenshot.png)
 
 ## Support Platform
 
 - Figma
 - MasterGo
 - Pixso
-- 即时设计
+- JsDesign
 
-## Install
+## Run Demo
+
+Run vue example locally:
+
+1. copy ./example/vue/.env.sample to ./example/vue/.env
+2. replace <YOUR_KEY_HERE> in ./example/vue/.env
+3. run command:
+
+```bash
+pnpm vue-example:install
+pnpm vue-example:dev
+```
+
+## Install SDK
 
 ```bash
 npm install @refore/copy-to-design-sdk
@@ -17,7 +32,7 @@ yarn add @refore/copy-to-design-sdk
 pnpm install @refore/copy-to-design-sdk
 ```
 
-## Usage
+## Use SDK
 
 ```typescript
 import { CopyToDesign, PlatformType } from '@refore/copy-to-design-sdk';
