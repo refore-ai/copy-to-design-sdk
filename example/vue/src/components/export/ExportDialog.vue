@@ -5,6 +5,7 @@ import SuccessAnimation from '../animation/SuccessAnimation.vue';
 import type { ButtonOption } from '../selectable-button/types';
 import { Dialog, DialogContent } from '../ui/dialog';
 import type { ExportContent } from './type';
+import { Button } from '../ui/button';
 import { DESIGN_APPS } from './type';
 
 const props = defineProps<{
@@ -144,9 +145,9 @@ const openPluginPage = () => {
               }}
             </div>
             <div class="mt-2">
-              <ui-button class="bg-gray-900 px-6 py-2 text-white hover:bg-gray-800" @click="openPluginPage">
+              <button class="bg-gray-900 px-6 py-2 text-white hover:bg-gray-800" @click="openPluginPage">
                 {{ props.selectedOption.id === 'Figma' ? 'Copy to Figma plugin' : 'Copy to Design plugin' }}
-              </ui-button>
+              </button>
             </div>
             <div class="mt-2">
               {{
@@ -166,13 +167,13 @@ const openPluginPage = () => {
           </div>
 
           <div class="mt-2">
-            <ui-button
+            <button
               v-if="exportResult === 'error'"
               class="bg-gray-900 px-6 py-2 text-white hover:bg-gray-800"
               @click="tryAgain"
             >
               Try again
-            </ui-button>
+            </button>
           </div>
         </div>
       </div>
