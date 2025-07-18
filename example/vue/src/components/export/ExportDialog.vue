@@ -7,6 +7,7 @@ import { Dialog, DialogContent } from '../ui/dialog';
 import type { ExportContent } from './type';
 import { Button } from '../ui/button';
 import { DESIGN_APPS } from './type';
+import { Button } from '../ui/button';
 
 const props = defineProps<{
   selectedOption: ButtonOption;
@@ -145,9 +146,9 @@ const openPluginPage = () => {
               }}
             </div>
             <div class="mt-2">
-              <button class="bg-gray-900 px-6 py-2 text-white hover:bg-gray-800" @click="openPluginPage">
+              <Button class="bg-gray-900 px-6 py-2 text-white hover:bg-gray-800" @click="openPluginPage">
                 {{ props.selectedOption.id === 'Figma' ? 'Copy to Figma plugin' : 'Copy to Design plugin' }}
-              </button>
+              </Button>
             </div>
             <div class="mt-2">
               {{
@@ -167,13 +168,13 @@ const openPluginPage = () => {
           </div>
 
           <div class="mt-2">
-            <button
+            <Button
               v-if="exportResult === 'error'"
               class="bg-gray-900 px-6 py-2 text-white hover:bg-gray-800"
               @click="tryAgain"
             >
               Try again
-            </button>
+            </Button>
           </div>
         </div>
       </div>
