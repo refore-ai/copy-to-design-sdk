@@ -1,3 +1,8 @@
+## <small>1.0.2 (2025-07-18)</small>
+
+* fix: add data-copy-endpoint attribute on refore-copy-to-design node ([726e5c0](https://github.com/refore-ai/copy-to-design-sdk/commit/726e5c0))
+* chore(readme): update usage code ([4a2e891](https://github.com/refore-ai/copy-to-design-sdk/commit/4a2e891))
+
 ## <small>1.0.1 (2025-07-17)</small>
 
 * fix(package.json): module and types field value error ([9b85246](https://github.com/refore-ai/copy-to-design-sdk/commit/9b85246))
