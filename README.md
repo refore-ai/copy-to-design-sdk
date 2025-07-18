@@ -20,15 +20,13 @@ Run vue example locally:
 3. run command:
 
 ```bash
-pnpm vue-example:install
+pnpm install
 pnpm vue-example:dev
 ```
 
 ## Install SDK
 
 ```bash
-npm install @refore/copy-to-design-sdk
-yarn add @refore/copy-to-design-sdk
 pnpm install @refore/copy-to-design-sdk
 ```
 
