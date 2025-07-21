@@ -152,7 +152,7 @@ const openPluginPage = () => {
                 {{ props.selectedOption.id === 'Figma' ? 'Copy to Figma plugin' : 'Copy to Design plugin' }}
               </Button>
             </div>
-            <div class="mt-2">
+            <div class="mt-2 text-[14px]">
               {{
                 `You can directly search for and open the ${
                   props.selectedOption.id === 'Figma' ? 'Copy to Figma' : 'Copy to Design'
