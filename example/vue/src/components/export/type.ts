@@ -32,7 +32,6 @@ export const DESIGN_APPS = {
 } as const;
 
 export type DesignAppKey = keyof typeof DESIGN_APPS;
-export type DesignAppId = PlatformType;
 
 export interface ExportContent {
   html: string;
