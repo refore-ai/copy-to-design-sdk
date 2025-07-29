@@ -2,7 +2,7 @@
 
 Import HTML pages into design tools like Figma via copy and paste.
 
-![](./assets/example-screenshot.png)
+<video src="https://s.dwimg.top/refore/copy-to-design/copy-to-figma-v1.mp4" controls></video>
 
 ## Run Example
 
