@@ -4,14 +4,7 @@ Import HTML pages into design tools like Figma via copy and paste.
 
 ![](./assets/example-screenshot.png)
 
-## Support Platform
-
-- Figma
-- MasterGo
-- Pixso
-- JsDesign
-
-## Run Demo
+## Run Example
 
 Run vue example locally:
 
@@ -20,14 +13,14 @@ Run vue example locally:
 3. run command:
 
 ```bash
-pnpm install
+pnpm i
 pnpm vue-example:dev
 ```
 
 ## Install SDK
 
 ```bash
-pnpm install @refore/copy-to-design-sdk
+pnpm i @refore/copy-to-design-sdk
 ```
 
 ## Use SDK
@@ -41,19 +34,8 @@ const copyToDesign = new CopyToDesign({
 
 const html = `<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Demo</title>
-
-    <style>
-      .box {
-        color: #fe3460;
-      }
-    </style>
-  </head>
   <body>
-    <div class="box">Here is my content</div>
+    Here is my content
   </body>
 </html>
 `;

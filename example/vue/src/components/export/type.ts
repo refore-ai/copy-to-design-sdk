@@ -6,7 +6,7 @@ export const DESIGN_APPS = {
     title: 'Figma',
     icon: '/logo/third-party/figma.svg',
     video: 'https://s.dwimg.top/copy-to-design/figma.webm',
-    plugin: 'https://mastergo.com/community/plugin/143082991349749',
+    plugin: 'https://www.figma.com/community/plugin/1530991148057606658',
   },
   MasterGo: {
     id: PlatformType.MasterGo,
