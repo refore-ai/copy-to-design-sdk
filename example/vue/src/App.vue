@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 
-import ToDesignApp from './components/export/ToDesignApp.vue';
+import CopyToDesignBtns from './components/export/CopyToDeisgnBtns.vue';
 import PreviewHtml from './components/preview/html.vue';
 import { Textarea } from './components/ui/textarea';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './components/ui/tabs';
@@ -43,7 +43,7 @@ const viewMode = ref('preview');
           <img src="/logo/demoway/refore.svg" class="h-5 w-5 mr-1" />
           Copy to Design SDK
         </Button>
-        <ToDesignApp :apps="['Figma', 'MasterGo', 'Pixso', 'JSDesign']" :content="input" class="ml-auto" />
+        <CopyToDesignBtns :apps="['Figma', 'MasterGo', 'Pixso', 'JSDesign']" :content="input" class="ml-auto" />
         <Tabs v-model="viewMode" class="ml-auto mr-4">
           <TabsList>
             <TabsTrigger value="preview">preview</TabsTrigger>
