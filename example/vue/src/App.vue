@@ -43,7 +43,7 @@ const viewMode = ref('preview');
           <img src="/logo/demoway/refore.svg" class="h-5 w-5 mr-1" />
           Copy to Design SDK
         </Button>
-        <CopyToDesignBtns :apps="['Figma', 'MasterGo', 'Pixso', 'JSDesign']" :content="input" class="ml-auto" />
+        <CopyToDesignBtns :apps="['Figma']" :content="input" class="ml-auto" />
         <Tabs v-model="viewMode" class="ml-auto mr-4">
           <TabsList>
             <TabsTrigger value="preview">preview</TabsTrigger>

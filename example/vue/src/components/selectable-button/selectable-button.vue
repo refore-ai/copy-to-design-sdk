@@ -60,7 +60,7 @@ const handleMainButtonClick = () => {
 };
 
 const buttonStyle = computed(() => {
-  if (!props.fixedWidth) return {};
+  if (!props.fixedWidth || filteredOptions.value.length <= 1) return {};
 
   const longestTitle = [...allExportOptions.value].sort((a, b) => b.title.length - a.title.length)[0]?.title || '';
 
@@ -69,7 +69,7 @@ const buttonStyle = computed(() => {
 });
 
 const dropdownStyle = computed(() => {
-  if (!props.fixedWidth) return {};
+  if (!props.fixedWidth || filteredOptions.value.length <= 1) return {};
 
   const longestTitle = [...allExportOptions.value].sort((a, b) => b.title.length - a.title.length)[0]?.title || '';
 
