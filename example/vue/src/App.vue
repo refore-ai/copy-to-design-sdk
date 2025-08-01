@@ -6,7 +6,6 @@ import PreviewHtml from './components/preview/html.vue';
 import { Textarea } from './components/ui/textarea';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './components/ui/tabs';
 import { Button } from './components/ui/button';
-import { PlatformType } from '@refore/copy-to-design-sdk';
 
 const input = ref('');
 

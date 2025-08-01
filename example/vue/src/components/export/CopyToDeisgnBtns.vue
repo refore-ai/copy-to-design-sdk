@@ -4,9 +4,13 @@ import { computed, ref } from 'vue';
 import SelectableButton from '../selectable-button/selectable-button.vue';
 import type { ButtonOption } from '../selectable-button/types';
 import ExportDialog from './ExportDialog.vue';
-import { DESIGN_APPS } from './type';
-import type { ExportContent } from './type';
 import { PlatformType } from '@refore/copy-to-design-sdk';
+interface ExportContent {
+  html: string;
+  width?: number;
+  height?: number;
+}
+
 interface Props {
   apps?: PlatformType[];
   content?: string;
@@ -29,11 +33,10 @@ const buttonConfig = computed(() => {
   const config: Record<string, ButtonOption> = {};
 
   props.apps.forEach((app) => {
-    const key = app as keyof typeof DESIGN_APPS;
     config[app] = {
       id: app,
-      title: `Copy to ${DESIGN_APPS[key].title}`,
-      icon: DESIGN_APPS[key].icon,
+      title: `Copy to Figma`,
+      icon: '/logo/third-party/figma.svg',
     };
   });
 
