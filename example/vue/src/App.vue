@@ -6,6 +6,7 @@ import PreviewHtml from './components/preview/html.vue';
 import { Textarea } from './components/ui/textarea';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './components/ui/tabs';
 import { Button } from './components/ui/button';
+import { PlatformType } from '@refore/copy-to-design-sdk';
 
 const input = ref('');
 
@@ -46,7 +47,7 @@ const viewMode = ref('preview');
           </Button>
         </div>
 
-        <CopyToDesignBtns :apps="['Figma']" :content="input" />
+        <CopyToDesignBtns :content="input" />
 
         <div class="flex flex-1 justify-end">
           <Tabs v-model="viewMode">
