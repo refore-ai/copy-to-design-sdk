@@ -4,18 +4,22 @@ import { computed, ref } from 'vue';
 import SelectableButton from '../selectable-button/selectable-button.vue';
 import type { ButtonOption } from '../selectable-button/types';
 import ExportDialog from './ExportDialog.vue';
-import { DESIGN_APPS } from './type';
-import type { DesignAppKey, ExportContent } from './type';
+import { PlatformType } from '@refore/copy-to-design-sdk';
+interface ExportContent {
+  html: string;
+  width?: number;
+  height?: number;
+}
 
 interface Props {
-  apps?: DesignAppKey[];
+  apps?: PlatformType[];
   content?: string;
   width?: number;
   height?: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  apps: () => ['Figma', 'MasterGo', 'Pixso', 'JSDesign'] as DesignAppKey[],
+  apps: () => [PlatformType.Figma] as PlatformType[],
   content: '',
   width: 1920,
   height: 1080,
@@ -31,8 +35,8 @@ const buttonConfig = computed(() => {
   props.apps.forEach((app) => {
     config[app] = {
       id: app,
-      title: `Copy to ${DESIGN_APPS[app].title}`,
-      icon: DESIGN_APPS[app].icon,
+      title: `Copy to Figma`,
+      icon: '/logo/third-party/figma.svg',
     };
   });
 
@@ -59,7 +63,7 @@ const closeDialog = () => {
 
 <template>
   <div class="bg-background text-foreground rounded-lg border shadow">
-    <SelectableButton :config="buttonConfig" :default-selected="props.apps[0]?.toLowerCase()" @select="handleSelect" />
+    <SelectableButton :config="buttonConfig" @select="handleSelect" />
     <ExportDialog
       v-model:open="isDialogOpen"
       :selected-option="selectedOption"

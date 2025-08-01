@@ -5,9 +5,13 @@ import { PlatformType } from '@refore/copy-to-design-sdk';
 import SuccessAnimation from '../animation/SuccessAnimation.vue';
 import type { ButtonOption } from '../selectable-button/types';
 import { Dialog, DialogContent } from '../ui/dialog';
-import type { ExportContent } from './type';
-import { DESIGN_APPS } from './type';
 import { Button } from '../ui/button';
+
+interface ExportContent {
+  html: string;
+  width?: number;
+  height?: number;
+}
 
 const props = defineProps<{
   selectedOption: ButtonOption;
@@ -30,8 +34,7 @@ const exportResult = ref<'success' | 'error' | null>(null);
 const videoRef = ref<HTMLVideoElement>();
 
 const videoSource = computed(() => {
-  const platform = props.selectedOption.id as keyof typeof DESIGN_APPS;
-  return DESIGN_APPS[platform]?.video || '/video/test.mp4';
+  return 'https://s.dwimg.top/refore/copy-to-design/copy-to-figma-v1.mp4';
 });
 
 const closeDialog = () => {
@@ -97,10 +100,7 @@ const tryAgain = () => {
 
 // Function to open plugin page
 const openPluginPage = () => {
-  const platform = props.selectedOption.id as keyof typeof DESIGN_APPS;
-  if (DESIGN_APPS[platform]?.plugin) {
-    window.open(DESIGN_APPS[platform].plugin, '_blank');
-  }
+  window.open('https://www.figma.com/community/plugin/1530991148057606658', '_blank');
 };
 </script>
 

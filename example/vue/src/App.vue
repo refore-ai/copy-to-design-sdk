@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 
-import ToDesignApp from './components/export/ToDesignApp.vue';
+import CopyToDesignBtns from './components/export/CopyToDeisgnBtns.vue';
 import PreviewHtml from './components/preview/html.vue';
 import { Textarea } from './components/ui/textarea';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './components/ui/tabs';
@@ -31,25 +31,31 @@ const viewMode = ref('preview');
 <template>
   <div class="bg-muted flex h-screen w-full p-8">
     <div class="bg-background flex flex-1 flex-col overflow-hidden rounded-xl border shadow">
-      <div class="flex h-[55px] w-full flex-none items-center gap-1 border-b px-1">
-        <Button
-          variant="ghost"
-          as="a"
-          href="https://github.com/refore-ai/copy-to-design-sdk"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="ml-4 text-lg font-semibold h-auto px-3 py-1.5 rounded-md transition-colors hover:text-primary"
-        >
-          <img src="/logo/demoway/refore.svg" class="h-5 w-5 mr-1" />
-          Copy to Design SDK
-        </Button>
-        <ToDesignApp :apps="['Figma', 'MasterGo', 'Pixso', 'JSDesign']" :content="input" class="ml-auto" />
-        <Tabs v-model="viewMode" class="ml-auto mr-4">
-          <TabsList>
-            <TabsTrigger value="preview">preview</TabsTrigger>
-            <TabsTrigger value="code">code</TabsTrigger>
-          </TabsList>
-        </Tabs>
+      <div class="flex h-[55px] w-full items-center border-b px-8">
+        <div class="flex flex-1 items-center gap-1">
+          <Button
+            variant="ghost"
+            as="a"
+            href="https://github.com/refore-ai/copy-to-design-sdk"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-lg font-semibold h-auto p-0 rounded-md transition-colors hover:text-primary"
+          >
+            <img src="/logo/demoway/refore.svg" class="h-5 w-5 mr-1" />
+            Copy to Design SDK
+          </Button>
+        </div>
+
+        <CopyToDesignBtns :content="input" />
+
+        <div class="flex flex-1 justify-end">
+          <Tabs v-model="viewMode">
+            <TabsList>
+              <TabsTrigger value="preview">preview</TabsTrigger>
+              <TabsTrigger value="code">code</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
       </div>
 
       <div class="flex-1 h-full overflow-auto">
