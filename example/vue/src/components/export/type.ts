@@ -1,4 +1,4 @@
-import { PlatformType } from '@refore/copy-to-design-sdk';
+import { PlatformType } from '@refore-ai/copy-to-design-sdk';
 
 export const DESIGN_APPS = {
   Figma: {

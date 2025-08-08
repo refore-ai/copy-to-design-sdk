@@ -1,4 +1,4 @@
-# @refore/copy-to-design-sdk
+# @refore-ai/copy-to-design-sdk
 
 Import HTML pages into design tools like Figma via copy and paste.
 
@@ -20,13 +20,13 @@ pnpm vue-example:dev
 ## Install SDK
 
 ```bash
-pnpm i @refore/copy-to-design-sdk
+pnpm i @refore-ai/copy-to-design-sdk
 ```
 
 ## Use SDK
 
 ```typescript
-import { CopyToDesign, PlatformType } from '@refore/copy-to-design-sdk';
+import { CopyToDesign, PlatformType } from '@refore-ai/copy-to-design-sdk';
 
 const copyToDesign = new CopyToDesign({
   key: '<YOUR_KEY>',

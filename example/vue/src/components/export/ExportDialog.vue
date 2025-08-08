@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { PlatformType } from '@refore/copy-to-design-sdk';
+import { PlatformType } from '@refore-ai/copy-to-design-sdk';
 
 import SuccessAnimation from '../animation/SuccessAnimation.vue';
 import type { ButtonOption } from '../selectable-button/types';
@@ -50,7 +50,7 @@ const handleExport = async () => {
   exportResult.value = null;
 
   try {
-    const { CopyToDesign } = await import('@refore/copy-to-design-sdk');
+    const { CopyToDesign } = await import('@refore-ai/copy-to-design-sdk');
 
     const copyToDesign = new CopyToDesign({
       key: API_KEY,

@@ -6,7 +6,7 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "paths": {
-      "@refore/copy-to-design-sdk": ["../../src/index.ts"],
+      "@refore-ai/copy-to-design-sdk": ["../../src/index.ts"],
       "@/*": ["./src/*"],
     },
     "allowJs": true,

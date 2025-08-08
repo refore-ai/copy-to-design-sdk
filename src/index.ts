@@ -63,7 +63,7 @@ export class CopyToDesign {
     };
   }
 
-  async copyToClipboardFromHTML(html: string, options: ICopyToClipboardFromHTMLOptions) {
+  async copyToClipboardFromHTML(html: string | string[], options: ICopyToClipboardFromHTMLOptions) {
     const { height, width, platform } = options;
 
     const endpoint = this.getEndpointByPlatform(platform);
