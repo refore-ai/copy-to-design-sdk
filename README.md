@@ -2,28 +2,13 @@
 
 Import HTML pages into design tools like Figma via copy and paste.
 
-<video src="https://github.com/user-attachments/assets/35d7dc5c-be51-4e28-aaf5-f0381cf701e1"></video>
-
-## Run Example
-
-Run vue example locally:
-
-1. copy ./example/vue/.env.sample to ./example/vue/.env
-2. replace <YOUR_KEY_HERE> in ./example/vue/.env
-3. run command:
+## Install
 
 ```bash
-pnpm i
-pnpm vue-example:dev
+pnpm add @refore-ai/copy-to-design-sdk
 ```
 
-## Install SDK
-
-```bash
-pnpm i @refore-ai/copy-to-design-sdk
-```
-
-## Use SDK
+## Use
 
 ```typescript
 import { CopyToDesign, PlatformType } from '@refore-ai/copy-to-design-sdk';
@@ -40,11 +25,24 @@ const html = `<!DOCTYPE html>
 </html>
 `;
 
-await copyToDesign.copyToClipboardFromHTML(html, {
+await copyToDesign.copyToClipboardFromHTML([html], {
   width: 1920,
   height: 1080,
   platform: PlatformType.Figma,
 });
 
 alert('Copy successful. You can now paste it into the plugin.');
+```
+
+## How to run example
+
+Run vue example locally:
+
+1. copy ./example/vue/.env.sample to ./example/vue/.env
+2. replace <YOUR_KEY_HERE> in ./example/vue/.env
+3. run command:
+
+```bash
+pnpm i
+pnpm vue-example:dev
 ```

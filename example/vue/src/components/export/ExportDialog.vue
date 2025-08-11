@@ -67,7 +67,7 @@ const handleExport = async () => {
 
     const platform = platformMapping[props.selectedOption.id as keyof typeof platformMapping] || PlatformType.Figma;
 
-    await copyToDesign.copyToClipboardFromHTML(props.exportContent.html, {
+    await copyToDesign.copyToClipboardFromHTML([props.exportContent.html], {
       width: props.exportContent.width || 1920,
       height: props.exportContent.height || 1080,
       platform,
