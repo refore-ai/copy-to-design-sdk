@@ -57,20 +57,10 @@ const handleExport = async () => {
       _endpoint: API_ENDPOINT,
     });
 
-    // Map our platform ID to SDK platform type
-    const platformMapping = {
-      Figma: PlatformType.Figma,
-      MasterGo: PlatformType.MasterGo,
-      JSDesign: PlatformType.JSDesign,
-      Pixso: PlatformType.PixsoChina,
-    };
-
-    const platform = platformMapping[props.selectedOption.id as keyof typeof platformMapping] || PlatformType.Figma;
-
     await copyToDesign.copyToClipboardFromHTML([props.exportContent.html], {
       width: props.exportContent.width || 1920,
       height: props.exportContent.height || 1080,
-      platform,
+      platform: props.selectedOption.id as PlatformType,
     });
 
     exportResult.value = 'success';

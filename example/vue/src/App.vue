@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-
+import { PlatformType } from '@refore-ai/copy-to-design-sdk';
 import ToDesignApp from './components/export/ToDesignApp.vue';
 import PreviewHtml from './components/preview/html.vue';
 import { Textarea } from './components/ui/textarea';
@@ -41,9 +41,9 @@ const viewMode = ref('preview');
           class="ml-4 text-lg font-semibold h-auto px-3 py-1.5 rounded-md transition-colors hover:text-primary"
         >
           <img src="/logo/demoway/refore.svg" class="h-5 w-5 mr-1" />
-          Copy to Design SDK
+          Refore Copy to Design SDK
         </Button>
-        <ToDesignApp :apps="['Figma', 'MasterGo', 'Pixso', 'JSDesign']" :content="input" class="ml-auto" />
+        <ToDesignApp :apps="[PlatformType.Figma, PlatformType.MasterGo]" :content="input" class="ml-auto" />
         <Tabs v-model="viewMode" class="ml-auto mr-4">
           <TabsList>
             <TabsTrigger value="preview">preview</TabsTrigger>
