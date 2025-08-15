@@ -2,16 +2,12 @@
 import { onMounted, ref, computed } from 'vue';
 import { PlatformType } from '@refore-ai/copy-to-design-sdk';
 import ToDesignApp from './components/export/ToDesignApp.vue';
+import ExampleSelector from "@/components/example-selector/example-selector.vue";
+import { ExampleInput } from '@/components/example-selector/types'
 import PreviewHtml from './components/preview/html.vue';
 import { Textarea } from './components/ui/textarea';
 import { Tabs, TabsList, TabsTrigger } from './components/ui/tabs';
 import { Button } from './components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from './components/ui/dropdown-menu';
-
-interface ExampleInput {
-  content: string
-  label: string
-}
 
 const inputs = ref<ExampleInput[]>([])
 const page = ref(0)
@@ -27,18 +23,20 @@ const combined_content = computed(() => inputs.value.map(i => i.content).join(''
 
 // 视图模式切换
 const viewMode = ref('preview');
+const isOpen = ref(false);
+
 
 onMounted(async () => {
   try {
     const res = await fetch('/example/files.json') // 在添加示例时需要向 files.json 添加文件名
     const files: string[] = await res.json()
 
-    const promises = files.map(async (fileName) => {
+    const promises = files.map(async (fileName, index) => {
       const r = await fetch(`/example/${fileName}`)
       const content = r.ok ? await r.text() : `<p>Error loading ${fileName}</p>`
       return {
         content,
-        label: fileName.replace('.html','').replace(/-/g, ' ')
+        label: `page ${index + 1}`
       }
     })
 
@@ -53,44 +51,34 @@ onMounted(async () => {
 <template>
   <div class="bg-muted flex h-screen w-full p-8">
     <div class="bg-background flex flex-1 flex-col overflow-hidden rounded-xl border shadow">
-      <div class="flex h-[55px] w-full flex-none items-center gap-1 border-b px-1">
-        <Button
-          variant="ghost"
-          as="a"
-          href="https://github.com/refore-ai/copy-to-design-sdk"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="ml-4 text-lg font-semibold h-auto px-3 py-1.5 rounded-md transition-colors hover:text-primary"
-        >
-          <img src="/logo/demoway/refore.svg" class="h-5 w-5 mr-1" />
-          Refore Copy to Design SDK
-        </Button>
-        <ToDesignApp :apps="[PlatformType.Figma, PlatformType.MasterGo]" :content="combined_content" class="ml-auto" />
+      <div class="flex h-[55px] w-full flex-none items-center border-b px-4">
+        <div class="flex items-center">
+          <Button
+              variant="ghost"
+              as="a"
+              href="https://github.com/refore-ai/copy-to-design-sdk"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-lg font-semibold h-auto px-3 py-1.5 rounded-md transition-colors hover:text-primary flex items-center"
+          >
+            <img src="/logo/demoway/refore.svg" class="h-5 w-5 mr-1" />
+            Refore Copy to Design SDK
+          </Button>
+        </div>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger class="ml-auto bg-background text-foreground rounded-lg border shadow px-2 py-1 text-sm">
-            more examples
-          </DropdownMenuTrigger>
+        <div class="flex-1 flex justify-center">
+          <ToDesignApp :apps="[PlatformType.Figma, PlatformType.MasterGo]" :content="combined_content" />
+        </div>
 
-          <DropdownMenuContent>
-            <DropdownMenuItem
-              v-for="(opt, idx) in inputs"
-              :key="idx"
-              class="h-6 rounded px-2 hover:bg-gray-50 mt-1"
-              :class="{ 'bg-gray-200' : idx === page }"
-              @click="page = idx"
-            >
-              {{ opt.label }}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        <Tabs v-model="viewMode" class="ml-auto mr-4">
-          <TabsList>
-            <TabsTrigger value="preview">preview</TabsTrigger>
-            <TabsTrigger value="code">code</TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <div class="flex items-center space-x-2">
+          <ExampleSelector v-model="page" :inputs="inputs" />
+          <Tabs v-model="viewMode" class="ml-3">
+            <TabsList>
+              <TabsTrigger value="preview">preview</TabsTrigger>
+              <TabsTrigger value="code">code</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
       </div>
 
       <div class="flex-1 h-full overflow-auto">
