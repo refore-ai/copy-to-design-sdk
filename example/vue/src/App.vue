@@ -23,8 +23,6 @@ const combined_content = computed(() => inputs.value.map(i => i.content).join(''
 
 // 视图模式切换
 const viewMode = ref('preview');
-const isOpen = ref(false);
-
 
 onMounted(async () => {
   try {
@@ -72,8 +70,8 @@ onMounted(async () => {
 
         <div class="flex items-center space-x-2">
           <ExampleSelector v-model="page" :inputs="inputs" />
-          <Tabs v-model="viewMode" class="ml-3">
-            <TabsList>
+          <Tabs v-model="viewMode" class="ml-4">
+            <TabsList class="grid w-full grid-cols-2 px-1">
               <TabsTrigger value="preview">preview</TabsTrigger>
               <TabsTrigger value="code">code</TabsTrigger>
             </TabsList>
