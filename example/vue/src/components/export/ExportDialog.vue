@@ -1,4 +1,19 @@
 <script setup lang="ts">
+/**
+ * ExportDialog component
+ * ======================
+ * Core functionality:
+ * 1. Provides a visual interface to export HTML content to design tools (e.g., Figma)
+ * 2. Automatically copies content to the system clipboard
+ * 3. Supports jumping to the design tool plugin page
+ * 4. Provides complete export status feedback (loading/success/failure)
+ * 
+ * Design highlights:
+ * - Dynamically adapts UI and logic based on platform type (DESIGN_APPS)
+ * - Configures API keys and endpoints via environment variables
+ * - Built-in video demonstration functionality
+ * - Supports retry after export failure
+ */
 import { computed, ref, watch } from 'vue';
 import { PlatformType } from '@refore-ai/copy-to-design-sdk';
 
@@ -20,13 +35,27 @@ const emit = defineEmits<{
 
 const open = defineModel<boolean>('open');
 
+// Design tool SDK authentication key
+// Must be configured via environment variable VITE_COPY_TO_DESIGN_KEY
 const API_KEY = import.meta.env.VITE_COPY_TO_DESIGN_KEY;
+
+// Design tool SDK endpoint configuration
+// Optional configuration via environment variable VITE_COPY_TO_DESIGN_ENDPOINT
+// Return function form ensures dynamically getting the latest value
 const API_ENDPOINT = import.meta.env.VITE_COPY_TO_DESIGN_ENDPOINT
   ? () => import.meta.env.VITE_COPY_TO_DESIGN_ENDPOINT
   : undefined;
 
+// Export status flag
+// true means export operation is in progress
 const isExporting = ref(false);
+
+// Export result status
+// Possible values: 'success', 'error', null (initial state)
 const exportResult = ref<'success' | 'error' | null>(null);
+
+// Video element reference
+// Used to control platform demo video playback
 const videoRef = ref<HTMLVideoElement>();
 
 const videoSource = computed(() => {
@@ -40,12 +69,23 @@ const closeDialog = () => {
   exportResult.value = null;
 };
 
+/**
+ * Core method for executing export
+ * Process:
+ * 1. Verify if export content exists
+ * 2. Set loading state
+ * 3. Dynamically load SDK
+ * 4. Call SDK to copy HTML to clipboard
+ * 5. Handle success/failure status
+ */
 const handleExport = async () => {
+  // Pre-check: Ensure there is content to export
   if (!props.exportContent) {
     exportResult.value = 'error';
     return;
   }
 
+  // Set loading state
   isExporting.value = true;
   exportResult.value = null;
 
@@ -95,6 +135,13 @@ const openPluginPage = () => {
 </script>
 
 <template>
+  <!-- Main dialog structure -->
+  <!--
+    Function description:
+    - v-model:open controls dialog show/hide
+    - @update:open resets state when handling close event
+    - Contains video demo area and export status feedback area
+  -->
   <Dialog v-model:open="open" @update:open="(value: boolean) => !value && closeDialog()">
     <DialogContent class="max-h-[90vh] min-w-[600px] overflow-hidden p-0 transition-all duration-200">
       <div class="relative aspect-video overflow-hidden bg-gray-100">

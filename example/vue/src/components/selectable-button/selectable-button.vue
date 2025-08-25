@@ -1,4 +1,17 @@
 <script setup lang="ts">
+/**
+ * SelectableButton component
+ * ======================
+ * Core functionality:
+ * 1. Provides a main button to display the currently selected option
+ * 2. Supports dropdown menu for selecting other options
+ * 3. Supports fixed width or adaptive width
+ * 
+ * Design highlights:
+ * - Uses Vue 3's Composition API for state management
+ * - Passes configuration options and callbacks via Props
+ * - Supports two-way binding (v-model)
+ */
 import { ChevronDown } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 
@@ -13,15 +26,20 @@ import {
 import type { ButtonOption } from './types';
 
 interface SelectableButtonProps {
+  // Configuration options, key is option ID, value is option object
   config: Record<string, ButtonOption>;
+  // Callback function when option is selected
   onSelect?: (option: ButtonOption) => void;
+  // Whether to fix width (true: fixed width; false: adaptive width)
   fixedWidth?: boolean;
 }
 
+// Component Props, default fixedWidth is true
 const props = withDefaults(defineProps<SelectableButtonProps>(), {
   fixedWidth: true,
 });
 
+// Two-way binding value, represents currently selected option ID
 const modelValue = defineModel<string>('modelValue', { default: '' });
 
 const allExportOptions = computed(() => Object.values(props.config));
@@ -44,6 +62,12 @@ const availableDropdownOptions = computed(() =>
 
 const showDropdown = computed(() => filteredOptions.value.length > 1);
 
+/**
+ * Handle option selection event
+ * 1. Update the selected option
+ * 2. Close the dropdown menu
+ * 3. 触发 onSelect 回调（如果存在）
+ */
 const handleSelect = (option: ButtonOption) => {
   selectedOption.value = option;
   isOpen.value = false;
@@ -80,10 +104,13 @@ const dropdownStyle = computed(() => {
 </script>
 
 <template>
+  <!-- Root container of the component -->
   <div class="relative">
+    <!-- Dropdown menu component -->
     <DropdownMenu v-model:open="isOpen">
+      <!-- Container for buttons and dropdown triggers -->
       <div class="flex overflow-hidden rounded-md border border-gray-200">
-        <!-- Main Button -->
+        <!-- Main button: displays the currently selected option -->
         <Button
           variant="outline"
           class="h-8 flex-1 justify-start rounded-none border-0 bg-white px-2 text-left text-xs font-normal hover:rounded-none"

@@ -1,4 +1,17 @@
 <script setup lang="ts">
+/**
+ * ToDesignApp component
+ * ======================
+ * Core functionality:
+ * 1. Provides design tool selection buttons (e.g., Figma)
+ * 2. Configures export content (HTML, width, height)
+ * 3. Triggers the export dialog
+ * 
+ * Design highlights:
+ * - Supports multi-platform dynamic adaptation (via DESIGN_APPS configuration)
+ * - Uses Vue's Composition API for state management
+ * - Passes export content and platform configuration via Props
+ */
 import { computed, ref } from 'vue';
 
 import SelectableButton from '../selectable-button/selectable-button.vue';
@@ -22,7 +35,12 @@ const props = withDefaults(defineProps<Props>(), {
   height: 1080,
 });
 
+// Dialog display state
+// true means the dialog is open
 const isDialogOpen = ref(false);
+
+// Currently selected design tool option
+// Contains id, title and icon information
 const selectedOption = ref<ButtonOption>({ id: '', title: '', icon: '' });
 
 // Create config for SelectableButton
@@ -48,6 +66,11 @@ const exportContent = computed<ExportContent>(() => ({
 }));
 
 // Handle selection event
+/**
+ * Handle design tool selection event
+ * 1. Update the selected design tool option
+ * 2. Open the export dialog
+ */
 const handleSelect = (option: ButtonOption) => {
   selectedOption.value = option;
   isDialogOpen.value = true;

@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * 下拉菜单内容组件
+ * 控制下拉菜单的样式和交互逻辑
+ */
 import type { HTMLAttributes } from 'vue'
 import { reactiveOmit } from '@vueuse/core'
 import {

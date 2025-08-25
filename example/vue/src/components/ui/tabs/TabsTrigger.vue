@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * 标签页触发器组件
+ * 控制标签页的切换和样式
+ */
 import type { HTMLAttributes } from 'vue'
 import { reactiveOmit } from '@vueuse/core'
 import { TabsTrigger, type TabsTriggerProps, useForwardProps } from 'reka-ui'

@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * 对话框内容组件
+ * 包含关闭按钮和内容区域
+ */
 import { reactiveOmit } from '@vueuse/core';
 import { X } from 'lucide-vue-next';
 import {

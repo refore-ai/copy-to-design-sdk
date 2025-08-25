@@ -25,7 +25,7 @@ export default {
     [
       '@semantic-release/git',
       {
-        // eslint-disable-next-line no-template-curly-in-string
+        // Disable eslint rule for template literals
         message: 'chore(release): ${nextRelease.version} [skip ci]',
       },
     ],

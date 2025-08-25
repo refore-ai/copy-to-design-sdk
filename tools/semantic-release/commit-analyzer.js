@@ -33,7 +33,7 @@ function getGitChangedFiles(commit) {
  * @param {import('semantic-release').AnalyzeCommitsContext} context
  */
 export async function analyzeCommits(pluginConfig, context) {
-  // filter no src changed commits
+  // Filter commits with no source changes
   const commits = context.commits.filter((commit) => {
     const changedFiles = getGitChangedFiles(commit.hash);
     const hasReleaseFilesChange = changedFiles.some((file) => {

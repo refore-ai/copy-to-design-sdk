@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * 文本区域组件
+ * 支持双向绑定和自定义样式
+ */
 import type { HTMLAttributes } from 'vue'
 import { useVModel } from '@vueuse/core'
 import { cn } from '@/lib/utils'

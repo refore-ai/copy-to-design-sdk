@@ -1,91 +1,79 @@
+<!-- Vue 3 single-file component for displaying and manipulating design content -->
 <script setup lang="ts">
-import { onMounted, ref, computed } from 'vue';
+// Import Vue related APIs
+import { onMounted, ref } from 'vue';
+// Import design platform types
 import { PlatformType } from '@refore-ai/copy-to-design-sdk';
+// Import child components
 import ToDesignApp from './components/export/ToDesignApp.vue';
-import ExampleSelector from "@/components/example-selector/example-selector.vue";
-import { ExampleInput } from '@/components/example-selector/types'
 import PreviewHtml from './components/preview/html.vue';
 import { Textarea } from './components/ui/textarea';
-import { Tabs, TabsList, TabsTrigger } from './components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from './components/ui/tabs';
 import { Button } from './components/ui/button';
 
-const inputs = ref<ExampleInput[]>([])
-const page = ref(0)
+// Input content state management
+const input = ref('');
 
-const active_input = computed({
-  get: () => inputs.value[page.value]?.content || '',
-  set: (val) => {
-    if (inputs.value[page.value]) inputs.value[page.value].content = val
-  }
-})
-
-const combined_content = computed(() => inputs.value.map(i => i.content).join(''))
-
-// 视图模式切换
-const viewMode = ref('preview');
-
+// Load example HTML content after component is mounted
 onMounted(async () => {
   try {
-    const res = await fetch('/example/files.json') // 在添加示例时需要向 files.json 添加文件名
-    const files: string[] = await res.json()
-
-    const promises = files.map(async (fileName, index) => {
-      const r = await fetch(`/example/${fileName}`)
-      const content = r.ok ? await r.text() : `<p>Error loading ${fileName}</p>`
-      return {
-        content,
-        label: `page ${index + 1}`
-      }
-    })
-
-    inputs.value = await Promise.all(promises)
-  } catch (err) {
-    console.error('Failed to load example files:', err)
+    const response = await fetch('/example/google.html');
+    if (response.ok) {
+      input.value = await response.text();
+    } else {
+      console.error('Failed to fetch google.html:', response.statusText);
+      input.value = '<p>Error loading content</p>';
+    }
+  } catch (error) {
+    console.error('Error fetching google.html:', error);
+    input.value = '<p>Error loading content</p>';
   }
-})
+});
 
+// View mode toggle (preview or code)
+const viewMode = ref('preview');
 </script>
 
 <template>
+  <!-- Main container -->
   <div class="bg-muted flex h-screen w-full p-8">
+    <!-- Content area -->
     <div class="bg-background flex flex-1 flex-col overflow-hidden rounded-xl border shadow">
-      <div class="flex h-[55px] w-full flex-none items-center border-b px-4">
-        <div class="flex items-center">
-          <Button
-              variant="ghost"
-              as="a"
-              href="https://github.com/refore-ai/copy-to-design-sdk"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text-lg font-semibold h-auto px-3 py-1.5 rounded-md transition-colors hover:text-primary flex items-center"
-          >
-            <img src="/logo/demoway/refore.svg" class="h-5 w-5 mr-1" />
-            Refore Copy to Design SDK
-          </Button>
-        </div>
-
-        <div class="flex-1 flex justify-center">
-          <ToDesignApp :apps="[PlatformType.Figma, PlatformType.MasterGo]" :content="combined_content" />
-        </div>
-
-        <div class="flex items-center space-x-2">
-          <ExampleSelector v-model="page" :inputs="inputs" />
-          <Tabs v-model="viewMode" class="ml-4">
-            <TabsList class="grid w-full grid-cols-2 px-1">
-              <TabsTrigger value="preview">preview</TabsTrigger>
-              <TabsTrigger value="code">code</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
+      <!-- Top navigation bar -->
+      <div class="flex h-[55px] w-full flex-none items-center gap-1 border-b px-1">
+        <!-- Project title and links -->
+        <Button
+          variant="ghost"
+          as="a"
+          href="https://github.com/refore-ai/copy-to-design-sdk"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="ml-4 text-lg font-semibold h-auto px-3 py-1.5 rounded-md transition-colors hover:text-primary"
+        >
+          <img src="/logo/demoway/refore.svg" class="h-5 w-5 mr-1" />
+          Refore Copy to Design SDK
+        </Button>
+        <!-- Design tool buttons -->
+        <ToDesignApp :apps="[PlatformType.Figma, PlatformType.MasterGo]" :content="input" class="ml-auto" />
+        <!-- View mode toggle tabs -->
+        <Tabs v-model="viewMode" class="ml-auto mr-4">
+          <TabsList>
+            <TabsTrigger value="preview">preview</TabsTrigger>
+            <TabsTrigger value="code">code</TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
 
+      <!-- Content display area -->
       <div class="flex-1 h-full overflow-auto">
+        <!-- Code mode -->
         <div v-if="viewMode === 'code'" class="w-full h-full p-4">
-          <Textarea v-model="active_input" class="min-h-full w-full resize-y" />
+          <Textarea v-model="input" class="min-h-full w-full resize-y" />
         </div>
 
+        <!-- Preview mode -->
         <div v-if="viewMode === 'preview'" class="h-full w-full p-4">
-          <PreviewHtml :code="active_input" class="w-full h-full" />
+          <PreviewHtml :code="input" class="w-full h-full" />
         </div>
       </div>
     </div>
