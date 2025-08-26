@@ -33,7 +33,8 @@
     "prepublishOnly": "pnpm run build",
     "release": "semantic-release --no-ci",
     "postinstall": "pnpm --filter vue-example install",
-    "vue-example:dev": "pnpm --filter vue-example dev"
+    "vue-example:dev": "pnpm --filter vue-example dev",
+    "react-example:dev": "pnpm --filter react-example dev" 
   },
   "publishConfig": {
     "access": "public",
@@ -45,6 +46,7 @@
     }
   },
   "dependencies": {
+    "@refore-ai/copy-to-design-sdk": "^1.1.0",
     "crypto-js": "^4.2.0",
     "nanoid": "^5.1.5",
     "ofetch": "^1.4.1"

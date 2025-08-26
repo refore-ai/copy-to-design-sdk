@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * 下拉菜单项组件
+ * 支持变体和自定义样式
+ */
 import type { HTMLAttributes } from 'vue'
 import { reactiveOmit } from '@vueuse/core'
 import { DropdownMenuItem, type DropdownMenuItemProps, useForwardProps } from 'reka-ui'

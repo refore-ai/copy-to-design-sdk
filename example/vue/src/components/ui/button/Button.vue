@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * 基础按钮组件
+ * 支持多种变体和尺寸
+ */
 import type { HTMLAttributes } from 'vue'
 import { Primitive, type PrimitiveProps } from 'reka-ui'
 import { cn } from '@/lib/utils'
