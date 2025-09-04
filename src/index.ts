@@ -3,6 +3,8 @@ import { nanoid } from 'nanoid';
 import type { FetchContext } from 'ofetch';
 import { createFetch } from 'ofetch';
 
+import { version as VERSION } from '../package.json';
+
 export enum PlatformType {
   Figma = 'figma',
   MasterGo = 'mastergo',
@@ -10,9 +12,15 @@ export enum PlatformType {
   PixsoChina = 'pixso-china',
 }
 
+export enum ImportMode {
+  Quick = 'quick',
+  Interactive = 'interactive',
+}
+
 export interface ICopyToClipboardFromHTMLOptions {
-  width: number;
-  height: number;
+  width?: number;
+  height?: number;
+  importMode?: ImportMode;
   platform: PlatformType;
 }
 
@@ -64,11 +72,11 @@ export class CopyToDesign {
   }
 
   async copyToClipboardFromHTML(html: string | string[], options: ICopyToClipboardFromHTMLOptions) {
-    const { height, width, platform } = options;
+    const { platform, importMode = ImportMode.Interactive, width, height } = options;
 
     const endpoint = this.getEndpointByPlatform(platform);
 
-    const source = JSON.stringify({ type: 'html', html, height, width });
+    const source = JSON.stringify({ type: 'html', html, importMode, width, height });
     const secret = nanoid(32);
     const encrypted = CryptoJS.AES.encrypt(source, secret);
 
@@ -83,6 +91,7 @@ export class CopyToDesign {
 
     const div = document.createElement('refore-copy-to-design');
     div.setAttribute('data-copy-id', res.copyId);
+    div.setAttribute('data-copy-sdk-version', VERSION);
     div.setAttribute('data-copy-endpoint', endpoint);
     div.setAttribute('data-copy-content', encrypted.toString());
 
