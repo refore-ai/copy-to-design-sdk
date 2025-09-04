@@ -57,10 +57,11 @@ const handleExport = async () => {
       _endpoint: API_ENDPOINT,
     });
 
-    await copyToDesign.copyToClipboardFromHTML([props.exportContent.html], {
-      width: props.exportContent.width || 1920,
-      height: props.exportContent.height || 1080,
+    await copyToDesign.copyToClipboardFromHTML(props.exportContent.html, {
+      width: props.exportContent.width,
+      height: props.exportContent.height,
       platform: props.selectedOption.id as PlatformType,
+      importMode: props.exportContent.importMode,
     });
 
     exportResult.value = 'success';

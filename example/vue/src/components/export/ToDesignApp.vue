@@ -6,20 +6,18 @@ import type { ButtonOption } from '../selectable-button/types';
 import ExportDialog from './ExportDialog.vue';
 import { DESIGN_APPS } from './type';
 import type { ExportContent } from './type';
-import { PlatformType } from '@refore-ai/copy-to-design-sdk';
+import { ImportMode, PlatformType } from '@refore-ai/copy-to-design-sdk';
 
 interface Props {
   apps?: PlatformType[];
-  content?: string;
+  content: string | string[];
   width?: number;
   height?: number;
+  importMode?: ImportMode;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   apps: () => [PlatformType.Figma],
-  content: '',
-  width: 1920,
-  height: 1080,
 });
 
 const isDialogOpen = ref(false);
@@ -45,6 +43,7 @@ const exportContent = computed<ExportContent>(() => ({
   html: props.content,
   width: props.width,
   height: props.height,
+  importMode: props.importMode,
 }));
 
 // Handle selection event
@@ -59,13 +58,15 @@ const closeDialog = () => {
 </script>
 
 <template>
-  <div class="bg-background text-foreground rounded-lg border shadow">
-    <SelectableButton :config="buttonConfig" @select="handleSelect" />
-    <ExportDialog
-      v-model:open="isDialogOpen"
-      :selected-option="selectedOption"
-      :export-content="exportContent"
-      @close="closeDialog"
-    />
-  </div>
+  <SelectableButton
+    class="bg-background text-foreground rounded-lg border shadow-xs"
+    :config="buttonConfig"
+    @select="handleSelect"
+  />
+  <ExportDialog
+    v-model:open="isDialogOpen"
+    :selected-option="selectedOption"
+    :export-content="exportContent"
+    @close="closeDialog"
+  />
 </template>

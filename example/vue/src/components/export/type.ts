@@ -1,3 +1,4 @@
+import type { ImportMode } from '@refore-ai/copy-to-design-sdk';
 import { PlatformType } from '@refore-ai/copy-to-design-sdk';
 
 export const DESIGN_APPS = {
@@ -32,7 +33,8 @@ export const DESIGN_APPS = {
 } as const;
 
 export interface ExportContent {
-  html: string;
+  html: string | string[];
   width?: number;
   height?: number;
+  importMode?: ImportMode;
 }

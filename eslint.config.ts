@@ -8,6 +8,7 @@ export default antfu(
     markdown: false,
     typescript: {
       overrides: {
+        'ts/no-empty-object-type': 'off',
         'ts/ban-ts-comment': 'off',
         'ts/no-redeclare': 'off',
       },
