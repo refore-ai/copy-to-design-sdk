@@ -17,7 +17,7 @@ export interface ExampleInput {
   label: string;
 }
 
-const examples = ref<ExampleInput[]>([
+const pages = ref<ExampleInput[]>([
   {
     label: 'Google',
     content: GOOGLE_DEMO_HTML,
@@ -27,15 +27,15 @@ const examples = ref<ExampleInput[]>([
     content: SEARCH_RESULT_DEMO_HTML,
   },
 ]);
-const copyContents = computed(() => examples.value.map((i) => i.content));
+const copyContents = computed(() => pages.value.map((i) => i.content));
 const currentExampleIndex = ref(0);
 const importMode = ref(ImportMode.Interactive);
-const selectViewportInPlugin = ref(false);
+const includeViewport = ref(true);
 
 const active_input = computed({
-  get: () => examples.value[currentExampleIndex.value]?.content || '',
+  get: () => pages.value[currentExampleIndex.value]?.content || '',
   set: (val) => {
-    examples.value[currentExampleIndex.value].content = val;
+    pages.value[currentExampleIndex.value].content = val;
   },
 });
 
@@ -66,15 +66,15 @@ const viewMode = ref('preview');
             :apps="[PlatformType.Figma, PlatformType.MasterGo]"
             :content="copyContents"
             :import-mode="importMode"
-            :width="selectViewportInPlugin ? undefined : 1920"
-            :height="selectViewportInPlugin ? undefined : 1080"
+            :width="includeViewport ? 1920 : undefined"
+            :height="includeViewport ? 1080 : undefined"
           />
         </div>
 
         <div class="flex items-center gap-3">
           <div class="flex items-center gap-2">
-            <label class="text-sm">Select viewport in plugin:</label>
-            <Switch v-model="selectViewportInPlugin" />
+            <label class="text-sm">Include viewport:</label>
+            <Switch v-model="includeViewport" />
           </div>
 
           <div class="flex items-center gap-2">
@@ -90,13 +90,13 @@ const viewMode = ref('preview');
             </Select>
           </div>
           <div class="flex items-center gap-2">
-            <label class="text-sm">Examples:</label>
+            <label class="text-sm">Pages:</label>
             <Select v-model="currentExampleIndex">
               <SelectTrigger>
                 <SelectValue placeholder="Select a example page" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem v-for="(example, idx) in examples" :value="idx">{{ example.label }}</SelectItem>
+                <SelectItem v-for="(example, idx) in pages" :value="idx">{{ example.label }}</SelectItem>
               </SelectContent>
             </Select>
           </div>
