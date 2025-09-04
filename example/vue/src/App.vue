@@ -61,17 +61,7 @@ const viewMode = ref('preview');
           </Button>
         </div>
 
-        <div class="min-[2000px]:absolute min-[2000px]:left-1/2 min-[2000px]:-translate-x-1/2">
-          <ToDesignApp
-            :apps="[PlatformType.Figma, PlatformType.MasterGo]"
-            :content="copyContents"
-            :import-mode="importMode"
-            :width="includeViewport ? 1920 : undefined"
-            :height="includeViewport ? 1080 : undefined"
-          />
-        </div>
-
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-4">
           <div class="flex items-center gap-2">
             <label class="text-sm">Include viewport:</label>
             <Switch v-model="includeViewport" />
@@ -89,14 +79,23 @@ const viewMode = ref('preview');
               </SelectContent>
             </Select>
           </div>
+          <ToDesignApp
+            :apps="[PlatformType.Figma, PlatformType.MasterGo]"
+            :content="copyContents"
+            :import-mode="importMode"
+            :width="includeViewport ? 1920 : undefined"
+            :height="includeViewport ? 1080 : undefined"
+          />
+        </div>
+
+        <div class="flex items-center gap-3">
           <div class="flex items-center gap-2">
-            <label class="text-sm">Pages:</label>
             <Select v-model="currentExampleIndex">
               <SelectTrigger>
                 <SelectValue placeholder="Select a example page" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem v-for="(example, idx) in pages" :value="idx">{{ example.label }}</SelectItem>
+                <SelectItem v-for="(example, idx) in pages" :value="idx">Page {{ idx + 1 }}</SelectItem>
               </SelectContent>
             </Select>
           </div>
