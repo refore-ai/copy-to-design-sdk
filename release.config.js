@@ -10,7 +10,7 @@ export default {
       },
     ],
     [
-      '@semantic-release/release-notes-generator',
+      './tools/semantic-release/release-notes-generator.js',
       {
         preset: 'conventionalcommits',
       },
