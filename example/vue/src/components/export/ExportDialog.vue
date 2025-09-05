@@ -57,7 +57,8 @@ const handleExport = async () => {
       _endpoint: API_ENDPOINT,
     });
 
-    await copyToDesign.copyToClipboardFromHTML(props.exportContent.html, {
+    await copyToDesign.copyPasteInPlugin({
+      content: props.exportContent.html,
       width: props.exportContent.width,
       height: props.exportContent.height,
       platform: props.selectedOption.id as PlatformType,

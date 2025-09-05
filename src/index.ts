@@ -17,12 +17,23 @@ export enum ImportMode {
   Interactive = 'interactive',
 }
 
-export interface ICopyToClipboardFromHTMLOptions {
+export interface IGeneratePluginDataOptions {
   width?: number;
   height?: number;
   importMode?: ImportMode;
   platform: PlatformType;
+  attrs?: Record<string, string>;
 }
+
+export interface ICopyPasteInPluginOptions extends IGeneratePluginDataOptions {
+  content: string | string[];
+}
+
+// export interface ICopyPasteDirectOptionsOptions {
+//   width: number;
+//   height: number;
+//   platform: PlatformType.MasterGo;
+// }
 
 export interface CopyToDesignOptions {
   key: string;
@@ -71,8 +82,8 @@ export class CopyToDesign {
     };
   }
 
-  async copyToClipboardFromHTML(html: string | string[], options: ICopyToClipboardFromHTMLOptions) {
-    const { platform, importMode = ImportMode.Interactive, width, height } = options;
+  private async generatePluginReceiveData(html: string | string[], options: IGeneratePluginDataOptions) {
+    const { platform, importMode = ImportMode.Interactive, width, height, attrs = {} } = options;
 
     const endpoint = this.getEndpointByPlatform(platform);
 
@@ -95,10 +106,61 @@ export class CopyToDesign {
     div.setAttribute('data-copy-endpoint', endpoint);
     div.setAttribute('data-copy-content', encrypted.toString());
 
-    const data = new ClipboardItem({
-      'text/html': new Blob([div.outerHTML], { type: 'text/html' }),
+    for (const key of Object.keys(attrs)) {
+      div.setAttribute(key, attrs[key]);
+    }
+
+    return div.outerHTML;
+  }
+
+  /**
+   * @deprecated
+   * use `copyPasteInPlugin` instead
+   */
+  async copyToClipboardFromHTML(html: string | string[], options: IGeneratePluginDataOptions) {
+    return this.copyPasteInPlugin({
+      content: html,
+      ...options,
+    });
+  }
+
+  async copyPasteInPlugin(options: ICopyPasteInPluginOptions) {
+    const { content, ...restOptions } = options;
+    const data = await this.generatePluginReceiveData(content, restOptions);
+
+    const clipboardItem = new ClipboardItem({
+      'text/html': new Blob([data], { type: 'text/html' }),
     });
 
-    await navigator.clipboard.write([data]);
+    await navigator.clipboard.write([clipboardItem]);
   }
+
+  // async copyPasteDirect(html: string | string[], options: ICopyPasteDirectOptionsOptions) {
+  //   const { platform } = options;
+
+  //   const data = await this.generatePluginReceiveData(html, {
+  //     importMode: ImportMode.Quick,
+  //     ...options,
+  //     attrs: {
+  //       'data-rpa': 'true',
+  //     },
+  //   });
+
+  //   const endpoint = this.getEndpointByPlatform(platform);
+  //   const res = await $fetch<{ content: string }>('/api/refore/copy-to-design/generate-paste-to-platform-data', {
+  //     baseURL: endpoint,
+  //     method: 'POST',
+  //     headers: this.headers,
+  //     body: {
+  //       platform,
+  //       data,
+  //     },
+  //   });
+
+  //   const clipboardItem = new ClipboardItem({
+  //     'text/html': new Blob([res.content], { type: 'text/html' }),
+  //   });
+
+  //   await navigator.clipboard.write([clipboardItem]);
+  // }
 }

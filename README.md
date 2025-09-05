@@ -25,7 +25,8 @@ const html = `<!DOCTYPE html>
 </html>
 `;
 
-await copyToDesign.copyToClipboardFromHTML([html], {
+await copyToDesign.copyPasteInPlugin({
+  content: [html],
   width: 1920,
   height: 1080,
   platform: PlatformType.Figma,
