@@ -1,3 +1,9 @@
+## 1.2.0 (2025-09-05)
+
+* fix: use copyPasteInPlugin replace copyToClipboardFromHTML ([44aaf44](https://github.com/refore-ai/copy-to-design-sdk/commit/44aaf44))
+* feat: support importMode, optional width and height in options ([524f4e1](https://github.com/refore-ai/copy-to-design-sdk/commit/524f4e1))
+* chore(example): html argument arrayable ([2229805](https://github.com/refore-ai/copy-to-design-sdk/commit/2229805))
+
 ## 1.1.0 (2025-08-11)
 
 * feat: support copy multi html contents ([6662cf5](https://github.com/refore-ai/copy-to-design-sdk/commit/6662cf5))
