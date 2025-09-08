@@ -1,7 +1,10 @@
+import { Thumbmark } from '@thumbmarkjs/thumbmarkjs';
 import CryptoJS from 'crypto-js';
 import { nanoid } from 'nanoid';
 import type { FetchContext } from 'ofetch';
 import { createFetch } from 'ofetch';
+import { withResolvers } from 'radashi';
+import { io } from 'socket.io-client';
 
 import { version as VERSION } from '../package.json';
 
@@ -17,7 +20,7 @@ export enum ImportMode {
   Interactive = 'interactive',
 }
 
-export interface IGeneratePluginDataOptions {
+interface IGeneratePluginDataOptions {
   width?: number;
   height?: number;
   importMode?: ImportMode;
@@ -25,15 +28,17 @@ export interface IGeneratePluginDataOptions {
   attrs?: Record<string, string>;
 }
 
-export interface ICopyPasteInPluginOptions extends IGeneratePluginDataOptions {
+export interface ICopyPasteInPluginOptions extends Omit<IGeneratePluginDataOptions, 'attrs'> {
   content: string | string[];
 }
 
-// export interface ICopyPasteDirectOptionsOptions {
-//   width: number;
-//   height: number;
-//   platform: PlatformType.MasterGo;
-// }
+export interface ICopyPasteDirectOptionsOptions {
+  content: string | string[];
+  width: number;
+  height: number;
+  platform: PlatformType.MasterGo;
+  onWaitingForFocus?: () => void;
+}
 
 export interface CopyToDesignOptions {
   key: string;
@@ -41,48 +46,87 @@ export interface CopyToDesignOptions {
   _endpoint?: (platform: PlatformType) => string;
 }
 
-const $fetch = createFetch({
-  defaults: {
-    async onResponse(context: FetchContext) {
-      if (context.error) {
-        return;
-      }
+const SOCKET_RESOURCE_TYPE = 'CopyToDesignSDK';
 
-      const data = context.response?._data as any;
+interface IResourceSubscribeEvent<T> {
+  resourceType: string;
+  resourceId: string;
+  payload?: T;
+}
 
-      if (!data || typeof data !== 'object') {
-        return;
-      }
-
-      if (data.error) {
-        context.error = data.error;
-      } else if ('data' in data && context.response?._data) {
-        context.response._data = data.data;
-      }
-    },
-  },
-});
+interface ICopyToDesignSDKPayload {
+  success: boolean;
+  content: string;
+}
 
 const DEFAULT_GET_ENDPOINT = (platform: PlatformType) =>
   platform === PlatformType.Figma ? 'https://api.demoway.com' : 'https://api.demoway.cn';
 
 export class CopyToDesign {
-  constructor(private options: CopyToDesignOptions) {}
+  private thumbmark = new Thumbmark();
+  private visitorId: string | null = null;
+
+  private $fetch = createFetch({
+    defaults: {
+      onRequest: async (context) => {
+        const headers = context.options.headers;
+        const visitorId = await this.getVisitorId();
+
+        context.options.query = {
+          ...context.options.query,
+          visitorId,
+          version: VERSION,
+        };
+
+        headers.set('Authorization', `Basic ${btoa(JSON.stringify(this.getAuthorizationPayload()))}`);
+      },
+      async onResponse(context: FetchContext) {
+        if (context.error) {
+          return;
+        }
+
+        const data = context.response?._data as any;
+
+        if (!data || typeof data !== 'object') {
+          return;
+        }
+
+        if (data.error) {
+          context.error = data.error;
+        } else if ('data' in data && context.response?._data) {
+          context.response._data = data.data;
+        }
+      },
+    },
+  });
+
+  constructor(private options: CopyToDesignOptions) {
+    if (!this.options.key) {
+      throw new Error('options.key is Required');
+    }
+  }
+
+  private getAuthorizationPayload() {
+    const url = window.location.href;
+
+    return { url, key: this.options.key };
+  }
 
   private getEndpointByPlatform(platform: PlatformType) {
     const getEndPoint = this.options?._endpoint ?? DEFAULT_GET_ENDPOINT;
     return getEndPoint(platform);
   }
 
-  get headers() {
-    const url = window.location.href;
+  async getVisitorId() {
+    if (!this.visitorId) {
+      const tm = await this.thumbmark.get();
+      this.visitorId = tm.thumbmark;
+    }
 
-    return {
-      Authorization: `Basic ${btoa(JSON.stringify({ url, key: this.options.key }))}`,
-    };
+    return this.visitorId;
   }
 
-  private async generatePluginReceiveData(html: string | string[], options: IGeneratePluginDataOptions) {
+  private async generatePluginReceiveDataForHTML(html: string | string[], options: IGeneratePluginDataOptions) {
     const { platform, importMode = ImportMode.Interactive, width, height, attrs = {} } = options;
 
     const endpoint = this.getEndpointByPlatform(platform);
@@ -91,10 +135,9 @@ export class CopyToDesign {
     const secret = nanoid(32);
     const encrypted = CryptoJS.AES.encrypt(source, secret);
 
-    const res = await $fetch<{ copyId: string }>('/api/refore/copy-to-design/save-copy-info', {
+    const res = await this.$fetch<{ copyId: string }>('/api/refore/copy-to-design/save-copy-info', {
       baseURL: endpoint,
       method: 'POST',
-      headers: this.headers,
       body: {
         secret,
       },
@@ -126,7 +169,7 @@ export class CopyToDesign {
 
   async copyPasteInPlugin(options: ICopyPasteInPluginOptions) {
     const { content, ...restOptions } = options;
-    const data = await this.generatePluginReceiveData(content, restOptions);
+    const data = await this.generatePluginReceiveDataForHTML(content, restOptions);
 
     const clipboardItem = new ClipboardItem({
       'text/html': new Blob([data], { type: 'text/html' }),
@@ -135,32 +178,90 @@ export class CopyToDesign {
     await navigator.clipboard.write([clipboardItem]);
   }
 
-  // async copyPasteDirect(html: string | string[], options: ICopyPasteDirectOptionsOptions) {
-  //   const { platform } = options;
+  async copyPasteDirect(options: ICopyPasteDirectOptionsOptions) {
+    const { platform, content, width, height, onWaitingForFocus } = options;
 
-  //   const data = await this.generatePluginReceiveData(html, {
-  //     importMode: ImportMode.Quick,
-  //     ...options,
-  //     attrs: {
-  //       'data-rpa': 'true',
-  //     },
-  //   });
+    const endpoint = this.getEndpointByPlatform(platform);
+    const connection = io(endpoint, {
+      path: '/socket.io',
+      transports: ['websocket'],
+      auth: (cb) => {
+        cb({
+          type: 'refore-key',
+          ...this.getAuthorizationPayload(),
+        });
+      },
+    });
 
-  //   const endpoint = this.getEndpointByPlatform(platform);
-  //   const res = await $fetch<{ content: string }>('/api/refore/copy-to-design/generate-paste-to-platform-data', {
-  //     baseURL: endpoint,
-  //     method: 'POST',
-  //     headers: this.headers,
-  //     body: {
-  //       platform,
-  //       data,
-  //     },
-  //   });
+    const pluginReceiveData = await this.generatePluginReceiveDataForHTML(content, {
+      importMode: ImportMode.Quick,
+      width,
+      height,
+      platform,
+      attrs: {
+        'data-rpa': 'true',
+        // for debug
+        'data-copy-endpoint': 'https://api.demoway.cn',
+      },
+    });
 
-  //   const clipboardItem = new ClipboardItem({
-  //     'text/html': new Blob([res.content], { type: 'text/html' }),
-  //   });
+    const { taskId } = await this.$fetch<{ taskId: string }>('/api/refore/copy-to-design/generate-paste-direct-data', {
+      baseURL: endpoint,
+      method: 'POST',
+      body: {
+        platform,
+        content: pluginReceiveData,
+      },
+    });
 
-  //   await navigator.clipboard.write([clipboardItem]);
-  // }
+    connection.emit('resource:subscribe', {
+      resourceType: SOCKET_RESOURCE_TYPE,
+      resourceId: taskId,
+    });
+
+    const defer = withResolvers<ICopyToDesignSDKPayload>();
+
+    connection.on('resource:subscribe', (event: IResourceSubscribeEvent<ICopyToDesignSDKPayload>) => {
+      if (!event.payload) {
+        return;
+      }
+
+      if (event.payload.success) {
+        defer.resolve(event.payload);
+      } else {
+        defer.reject();
+      }
+    });
+
+    try {
+      const res = await defer.promise;
+
+      const clipboardItem = new ClipboardItem({
+        'text/html': new Blob([res.content], { type: 'text/html' }),
+      });
+
+      // check document is focused
+      if (!document.hasFocus()) {
+        onWaitingForFocus?.();
+
+        const focusDefer = withResolvers<void>();
+        const handleFocus = () => {
+          window.removeEventListener('focus', handleFocus);
+          focusDefer.resolve();
+        };
+        window.addEventListener('focus', handleFocus);
+        await focusDefer.promise;
+      }
+
+      // write clipboard after user focused
+      await navigator.clipboard.write([clipboardItem]);
+    } finally {
+      connection.emit('resource:unsubscribe', {
+        resourceType: SOCKET_RESOURCE_TYPE,
+        resourceId: taskId,
+      });
+
+      connection.disconnect();
+    }
+  }
 }

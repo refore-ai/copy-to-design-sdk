@@ -15,7 +15,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'close'): void;
+  close: [];
 }>();
 
 const open = defineModel<boolean>('open');

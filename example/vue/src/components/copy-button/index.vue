@@ -1,24 +1,23 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 
-import SelectableButton from '../selectable-button/selectable-button.vue';
+import SelectableButton from '../selectable-button/index.vue';
 import type { ButtonOption } from '../selectable-button/types';
-import ExportDialog from './ExportDialog.vue';
+import CopyPastePluginDialog from './copy-paste-plugin-dialog.vue';
+import CopyPasteDirectDialog from './copy-paste-direct-dialog.vue';
 import { DESIGN_APPS } from './type';
 import type { ExportContent } from './type';
 import { ImportMode, PlatformType } from '@refore-ai/copy-to-design-sdk';
 
 interface Props {
-  apps?: PlatformType[];
   content: string | string[];
   width?: number;
   height?: number;
   importMode?: ImportMode;
+  pasteDirect: boolean;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  apps: () => [PlatformType.Figma],
-});
+const props = defineProps<Props>();
 
 const isDialogOpen = ref(false);
 const selectedOption = ref<ButtonOption>({ id: '', title: '', icon: '' });
@@ -27,7 +26,7 @@ const selectedOption = ref<ButtonOption>({ id: '', title: '', icon: '' });
 const buttonConfig = computed(() => {
   const config: Record<string, ButtonOption> = {};
 
-  props.apps.forEach((app) => {
+  [PlatformType.Figma, PlatformType.MasterGo].forEach((app) => {
     config[app] = {
       id: app,
       title: `Copy to ${DESIGN_APPS[app].title}`,
@@ -63,8 +62,14 @@ const closeDialog = () => {
     :config="buttonConfig"
     @select="handleSelect"
   />
-  <ExportDialog
-    v-model:open="isDialogOpen"
+  <CopyPastePluginDialog
+    :open="isDialogOpen && !pasteDirect"
+    :selected-option="selectedOption"
+    :export-content="exportContent"
+    @close="closeDialog"
+  />
+  <CopyPasteDirectDialog
+    :open="isDialogOpen && pasteDirect"
     :selected-option="selectedOption"
     :export-content="exportContent"
     @close="closeDialog"
