@@ -53,10 +53,10 @@ Copies HTML content to clipboard in a format that can be pasted into design tool
 
 | Parameter | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
-| `content` | `string \| string[]` | Yes | - | HTML content to be copied. Can be a single HTML string or an array of HTML strings for multiple pages. |
+| `content` | `string \| string[]` | Yes | - | HTML content to be converted, copied and pasted. Can be a single HTML string or an array of HTML strings for multiple pages. |
 | `platform` | `PlatformType` | Yes | - | Target design platform. One of: `PlatformType.Figma`, `PlatformType.MasterGo`, `PlatformType.JSDesign`, `PlatformType.PixsoChina` |
-| `width` | `number` | No | - | Width of the design in pixels. |
-| `height` | `number` | No | - | Height of the design in pixels. |
+| `width` | `number` | No | - | Width of the page viewport in pixels. |
+| `height` | `number` | No | - | Height of the page viewport in pixels. |
 | `importMode` | `ImportMode` | No | `ImportMode.Interactive` | Import mode. One of: `ImportMode.Interactive` (user can adjust import settings), `ImportMode.Quick` (direct import) |
 
 #### Example
