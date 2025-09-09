@@ -62,6 +62,19 @@ const handleExport = async () => {
       width: props.exportContent.width ?? 1920,
       height: props.exportContent.height ?? 1080,
       platform: props.selectedOption.id as PlatformType.MasterGo,
+      onWaitingForFocus: async () => {
+        debugger;
+        if ('Notification' in window && Notification.permission === 'default') {
+          await Notification.requestPermission();
+        }
+
+        if ('Notification' in window && Notification.permission !== 'denied') {
+          new Notification('Data Ready', {
+            body: 'Data is ready, please return to the page to continue',
+            icon: '/favicon.ico',
+          });
+        }
+      },
     });
 
     exportResult.value = 'success';
@@ -84,14 +97,6 @@ watch(
 
 const tryAgain = () => {
   handleExport();
-};
-
-// Function to open plugin page
-const openPluginPage = () => {
-  const platform = props.selectedOption.id as keyof typeof DESIGN_APPS;
-  if (DESIGN_APPS[platform]?.plugin) {
-    window.open(DESIGN_APPS[platform].plugin, '_blank');
-  }
 };
 </script>
 
