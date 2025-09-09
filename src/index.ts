@@ -4,9 +4,10 @@ import { nanoid } from 'nanoid';
 import type { FetchContext } from 'ofetch';
 import { createFetch } from 'ofetch';
 import { withResolvers } from 'radashi';
-import { io } from 'socket.io-client';
 
 import { version as VERSION } from '../package.json';
+import type { ISocketAuthPayload } from './socket-manager';
+import { SocketManager } from './socket-manager';
 
 export enum PlatformType {
   Figma = 'figma',
@@ -37,7 +38,7 @@ export interface ICopyPasteDirectOptionsOptions {
   width: number;
   height: number;
   platform: PlatformType.MasterGo;
-  onWaitingForFocus?: () => void;
+  onWaitingForFocus?: () => any;
 }
 
 export interface CopyToDesignOptions {
@@ -46,15 +47,9 @@ export interface CopyToDesignOptions {
   _endpoint?: (platform: PlatformType) => string;
 }
 
-const SOCKET_RESOURCE_TYPE = 'CopyToDesignSDK';
+const COPY_TO_DESIGN_SDK_RESOURCE_TYPE = 'CopyToDesignSDK';
 
-interface IResourceSubscribeEvent<T> {
-  resourceType: string;
-  resourceId: string;
-  payload?: T;
-}
-
-interface ICopyToDesignSDKPayload {
+interface ICopyToDesignSDKResourceEventPayload {
   success: boolean;
   content: string;
 }
@@ -65,6 +60,7 @@ const DEFAULT_GET_ENDPOINT = (platform: PlatformType) =>
 export class CopyToDesign {
   private thumbmark = new Thumbmark();
   private visitorId: string | null = null;
+  private socketManager = new SocketManager();
 
   private $fetch = createFetch({
     defaults: {
@@ -182,16 +178,13 @@ export class CopyToDesign {
     const { platform, content, width, height, onWaitingForFocus } = options;
 
     const endpoint = this.getEndpointByPlatform(platform);
-    const connection = io(endpoint, {
-      path: '/socket.io',
-      transports: ['websocket'],
-      auth: (cb) => {
-        cb({
-          type: 'refore-key',
-          ...this.getAuthorizationPayload(),
-        });
-      },
-    });
+
+    const authPayload: ISocketAuthPayload = {
+      type: 'refore-key',
+      ...this.getAuthorizationPayload(),
+    };
+
+    const connection = await this.socketManager.getOrCreateConnection(endpoint, authPayload);
 
     const pluginReceiveData = await this.generatePluginReceiveDataForHTML(content, {
       importMode: ImportMode.Quick,
@@ -214,31 +207,13 @@ export class CopyToDesign {
       },
     });
 
-    connection.emit('resource:subscribe', {
-      resourceType: SOCKET_RESOURCE_TYPE,
-      resourceId: taskId,
-    });
-
-    const defer = withResolvers<ICopyToDesignSDKPayload>();
-
-    connection.on('resource:subscribe', (event: IResourceSubscribeEvent<ICopyToDesignSDKPayload>) => {
-      if (!event.payload) {
-        return;
-      }
-
-      if (event.payload.success) {
-        defer.resolve(event.payload);
-      } else {
-        defer.reject();
-      }
-    });
-
     try {
-      const res = await defer.promise;
-
-      const clipboardItem = new ClipboardItem({
-        'text/html': new Blob([res.content], { type: 'text/html' }),
-      });
+      // Subscribe to resource updates and wait for response
+      const res = await this.socketManager.subscribeToResource<ICopyToDesignSDKResourceEventPayload>(
+        connection,
+        COPY_TO_DESIGN_SDK_RESOURCE_TYPE,
+        taskId,
+      );
 
       // check document is focused
       if (!document.hasFocus()) {
@@ -254,14 +229,16 @@ export class CopyToDesign {
       }
 
       // write clipboard after user focused
+      const clipboardItem = new ClipboardItem({
+        'text/html': new Blob([res.content], { type: 'text/html' }),
+      });
       await navigator.clipboard.write([clipboardItem]);
     } finally {
-      connection.emit('resource:unsubscribe', {
-        resourceType: SOCKET_RESOURCE_TYPE,
-        resourceId: taskId,
-      });
+      // Unsubscribe from resource updates
+      this.socketManager.unsubscribeFromResource(connection, COPY_TO_DESIGN_SDK_RESOURCE_TYPE, taskId);
 
-      connection.disconnect();
+      // Release connection (but keep it alive for reuse)
+      this.socketManager.releaseConnection(endpoint);
     }
   }
 }
