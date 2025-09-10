@@ -193,8 +193,6 @@ export class CopyToDesign {
       platform,
       attrs: {
         'data-rpa': 'true',
-        // for debug
-        'data-copy-endpoint': 'https://api.demoway.cn',
       },
     });
 
