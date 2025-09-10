@@ -63,7 +63,7 @@ const handleExport = async () => {
       height: props.exportContent.height ?? 1080,
       platform: props.selectedOption.id as PlatformType.MasterGo,
       onWaitingForFocus: async () => {
-        debugger;
+        // debugger;
         if ('Notification' in window && Notification.permission === 'default') {
           await Notification.requestPermission();
         }
