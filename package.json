@@ -45,9 +45,12 @@
     }
   },
   "dependencies": {
+    "@thumbmarkjs/thumbmarkjs": "^1.2.0",
     "crypto-js": "^4.2.0",
     "nanoid": "^5.1.5",
-    "ofetch": "^1.4.1"
+    "ofetch": "^1.4.1",
+    "radashi": "^12.6.2",
+    "socket.io-client": "^4.8.1"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^5.2.1",

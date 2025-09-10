@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { ImportMode, PlatformType } from '@refore-ai/copy-to-design-sdk';
-import ToDesignApp from './components/export/ToDesignApp.vue';
+import ToDesignApp from './components/copy-button/index.vue';
 import PreviewHtml from './components/preview/html.vue';
 import { Textarea } from './components/ui/textarea';
 import { Tabs, TabsList, TabsTrigger } from './components/ui/tabs';
@@ -28,14 +28,15 @@ const pages = ref<ExampleInput[]>([
   },
 ]);
 const copyContents = computed(() => pages.value.map((i) => i.content));
-const currentExampleIndex = ref(0);
+const currentPageIndex = ref(0);
 const importMode = ref(ImportMode.Interactive);
 const includeViewport = ref(true);
+const pasteDirect = ref(false);
 
 const active_input = computed({
-  get: () => pages.value[currentExampleIndex.value]?.content || '',
+  get: () => pages.value[currentPageIndex.value]?.content || '',
   set: (val) => {
-    pages.value[currentExampleIndex.value].content = val;
+    pages.value[currentPageIndex.value].content = val;
   },
 });
 
@@ -63,13 +64,17 @@ const viewMode = ref('preview');
 
         <div class="flex items-center gap-4">
           <div class="flex items-center gap-2">
+            <label class="text-sm">Paste Direct:</label>
+            <Switch v-model="pasteDirect" />
+          </div>
+          <div class="flex items-center gap-2">
             <label class="text-sm">Include viewport:</label>
-            <Switch v-model="includeViewport" />
+            <Switch :disabled="pasteDirect" v-model="includeViewport" />
           </div>
 
           <div class="flex items-center gap-2">
             <label for="import-mode" class="text-sm">Import Mode:</label>
-            <Select v-model="importMode">
+            <Select v-model="importMode" :disabled="pasteDirect">
               <SelectTrigger id="import-mode">
                 <SelectValue placeholder="Select a import mode" />
               </SelectTrigger>
@@ -80,17 +85,17 @@ const viewMode = ref('preview');
             </Select>
           </div>
           <ToDesignApp
-            :apps="[PlatformType.Figma, PlatformType.MasterGo]"
             :content="copyContents"
             :import-mode="importMode"
-            :width="includeViewport ? 1920 : undefined"
-            :height="includeViewport ? 1080 : undefined"
+            :width="includeViewport || pasteDirect ? 1920 : undefined"
+            :height="includeViewport || pasteDirect ? 1080 : undefined"
+            :paste-direct="pasteDirect"
           />
         </div>
 
         <div class="flex items-center gap-3">
           <div class="flex items-center gap-2">
-            <Select v-model="currentExampleIndex">
+            <Select v-model="currentPageIndex">
               <SelectTrigger>
                 <SelectValue placeholder="Select a example page" />
               </SelectTrigger>

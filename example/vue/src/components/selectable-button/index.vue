@@ -25,12 +25,12 @@ const props = withDefaults(defineProps<SelectableButtonProps>(), {
 const modelValue = defineModel<string>('modelValue', { default: '' });
 
 const allExportOptions = computed(() => Object.values(props.config));
-const filteredOptions = computed(() => allExportOptions.value);
+
 const isOpen = ref(false);
 
 const selectedOption = computed({
   get: () => {
-    const selected = props.config[modelValue.value] || filteredOptions.value[0] || { id: '', title: '', icon: '' };
+    const selected = props.config[modelValue.value] || allExportOptions.value[0] || { id: '', title: '', icon: '' };
     return selected;
   },
   set: (option: ButtonOption) => {
@@ -39,10 +39,10 @@ const selectedOption = computed({
 });
 
 const availableDropdownOptions = computed(() =>
-  filteredOptions.value.filter((option) => option.id !== selectedOption.value.id),
+  allExportOptions.value.filter((option) => option.id !== selectedOption.value.id),
 );
 
-const showDropdown = computed(() => filteredOptions.value.length > 1);
+const showDropdown = computed(() => availableDropdownOptions.value.length);
 
 const handleSelect = (option: ButtonOption) => {
   selectedOption.value = option;
