@@ -4,8 +4,10 @@ import { nanoid } from 'nanoid';
 import type { FetchContext } from 'ofetch';
 import { createFetch } from 'ofetch';
 import { withResolvers } from 'radashi';
+import type { Socket } from 'socket.io-client';
 
 import { version as VERSION } from '../package.json';
+import { getPermission } from './permission';
 import type { ISocketAuthPayload } from './socket-manager';
 import { SocketManager } from './socket-manager';
 
@@ -29,17 +31,32 @@ interface IGeneratePluginDataOptions {
   attrs?: Record<string, string>;
 }
 
-export interface ICopyPasteInPluginOptions extends Omit<IGeneratePluginDataOptions, 'attrs'> {
+export interface IPreparePasteInPluginOptions extends Omit<IGeneratePluginDataOptions, 'attrs'> {
   content: string | string[];
 }
 
-export interface ICopyPasteDirectOptionsOptions {
+export interface ICopyCommonOption {
+  /**
+   * copy operation need user focus on the document, triggered when document is not focused
+   */
+  onWaitingForFocus?: () => any;
+  /**
+   * triggered when browser can't write clipboard in async function like safari, you should show another user action button to trigger clipboard write
+   * @param writeToClipboard - The function to perform actual clipboard write operation
+   */
+  onUserActionRequired?: (writeToClipboard: () => void) => void;
+}
+
+export interface ICopyPasteInPluginOptions extends IPreparePasteInPluginOptions, ICopyCommonOption {}
+
+export interface IPreparePasteDirectOptions {
   content: string | string[];
   width: number;
   height: number;
   platform: PlatformType.MasterGo;
-  onWaitingForFocus?: () => any;
 }
+
+export interface ICopyPasteDirectOptions extends IPreparePasteDirectOptions, ICopyCommonOption {}
 
 export interface CopyToDesignOptions {
   key: string;
@@ -113,7 +130,7 @@ export class CopyToDesign {
     return getEndPoint(platform);
   }
 
-  async getVisitorId() {
+  private async getVisitorId() {
     if (!this.visitorId) {
       const tm = await this.thumbmark.get();
       this.visitorId = tm.thumbmark;
@@ -152,18 +169,48 @@ export class CopyToDesign {
     return div.outerHTML;
   }
 
-  /**
-   * @deprecated
-   * use `copyPasteInPlugin` instead
-   */
-  async copyToClipboardFromHTML(html: string | string[], options: IGeneratePluginDataOptions) {
-    return this.copyPasteInPlugin({
-      content: html,
-      ...options,
-    });
+  async writeToClipboard(clipboardItem: ClipboardItem, options: ICopyCommonOption = {}) {
+    const { onWaitingForFocus, onUserActionRequired: onNotTransientActive } = options;
+
+    // check document is focused
+    if (!document.hasFocus()) {
+      onWaitingForFocus?.();
+
+      const focusDefer = withResolvers<void>();
+      const handleFocus = () => {
+        window.removeEventListener('focus', handleFocus);
+        focusDefer.resolve();
+      };
+      window.addEventListener('focus', handleFocus);
+      await focusDefer.promise;
+    }
+
+    const permission = await getPermission('clipboard-write');
+
+    if (permission === 'denied') {
+      throw new Error('clipboard-write permission is denied');
+    }
+
+    const writeClipboardDefer = withResolvers<void>();
+    const writeClipboard = async () => {
+      try {
+        await navigator.clipboard.write([clipboardItem]);
+        writeClipboardDefer.resolve();
+      } catch (err) {
+        writeClipboardDefer.reject(err);
+      }
+    };
+
+    if (permission !== 'not-support') {
+      await writeClipboard();
+    } else {
+      onNotTransientActive?.(writeClipboard);
+    }
+
+    await writeClipboardDefer.promise;
   }
 
-  async copyPasteInPlugin(options: ICopyPasteInPluginOptions) {
+  async preparePasteInPlugin(options: IPreparePasteInPluginOptions) {
     const { content, ...restOptions } = options;
     const data = await this.generatePluginReceiveDataForHTML(content, restOptions);
 
@@ -171,11 +218,27 @@ export class CopyToDesign {
       'text/html': new Blob([data], { type: 'text/html' }),
     });
 
-    await navigator.clipboard.write([clipboardItem]);
+    return clipboardItem;
   }
 
-  async copyPasteDirect(options: ICopyPasteDirectOptionsOptions) {
-    const { platform, content, width, height, onWaitingForFocus } = options;
+  async copyPasteInPlugin(options: ICopyPasteInPluginOptions) {
+    const clipboardItem = await this.preparePasteInPlugin(options);
+    await this.writeToClipboard(clipboardItem, options);
+  }
+
+  /**
+   * @deprecated
+   * use `copyPasteInPlugin` instead
+   */
+  async copyToClipboardFromHTML(html: string | string[], options: Omit<ICopyPasteInPluginOptions, 'content'>) {
+    return this.copyPasteInPlugin({
+      content: html,
+      ...options,
+    });
+  }
+
+  async preparePasteDirect(options: IPreparePasteDirectOptions) {
+    const { platform, content, width, height } = options;
 
     const endpoint = this.getEndpointByPlatform(platform);
 
@@ -184,28 +247,31 @@ export class CopyToDesign {
       ...this.getAuthorizationPayload(),
     };
 
-    const connection = await this.socketManager.getOrCreateConnection(endpoint, authPayload);
-
-    const pluginReceiveData = await this.generatePluginReceiveDataForHTML(content, {
-      importMode: ImportMode.Quick,
-      width,
-      height,
-      platform,
-      attrs: {
-        'data-rpa': 'true',
-      },
-    });
-
-    const { taskId } = await this.$fetch<{ taskId: string }>('/api/refore/copy-to-design/generate-paste-direct-data', {
-      baseURL: endpoint,
-      method: 'POST',
-      body: {
-        platform,
-        content: pluginReceiveData,
-      },
-    });
+    let connection: Socket | null = null;
+    let taskId: string | null = null;
 
     try {
+      connection = await this.socketManager.getOrCreateConnection(endpoint, authPayload);
+
+      const pluginReceiveData = await this.generatePluginReceiveDataForHTML(content, {
+        importMode: ImportMode.Quick,
+        width,
+        height,
+        platform,
+        attrs: {
+          'data-rpa': 'true',
+        },
+      });
+
+      ({ taskId } = await this.$fetch<{ taskId: string }>('/api/refore/copy-to-design/generate-paste-direct-data', {
+        baseURL: endpoint,
+        method: 'POST',
+        body: {
+          platform,
+          content: pluginReceiveData,
+        },
+      }));
+
       // Subscribe to resource updates and wait for response
       const res = await this.socketManager.subscribeToResource<ICopyToDesignSDKResourceEventPayload>(
         connection,
@@ -213,30 +279,28 @@ export class CopyToDesign {
         taskId,
       );
 
-      // check document is focused
-      if (!document.hasFocus()) {
-        onWaitingForFocus?.();
-
-        const focusDefer = withResolvers<void>();
-        const handleFocus = () => {
-          window.removeEventListener('focus', handleFocus);
-          focusDefer.resolve();
-        };
-        window.addEventListener('focus', handleFocus);
-        await focusDefer.promise;
-      }
-
       // write clipboard after user focused
+
       const clipboardItem = new ClipboardItem({
         'text/html': new Blob([res.content], { type: 'text/html' }),
       });
-      await navigator.clipboard.write([clipboardItem]);
-    } finally {
-      // Unsubscribe from resource updates
-      this.socketManager.unsubscribeFromResource(connection, COPY_TO_DESIGN_SDK_RESOURCE_TYPE, taskId);
 
-      // Release connection (but keep it alive for reuse)
-      this.socketManager.releaseConnection(endpoint);
+      return clipboardItem;
+      // Unsubscribe from resource updates
+    } finally {
+      if (connection && taskId) {
+        this.socketManager.unsubscribeFromResource(connection, COPY_TO_DESIGN_SDK_RESOURCE_TYPE, taskId);
+      }
+
+      if (connection) {
+        // Release connection (but keep it alive for reuse)
+        this.socketManager.releaseConnection(endpoint);
+      }
     }
+  }
+
+  async copyPasteDirect(options: ICopyPasteDirectOptions) {
+    const clipboardItem = await this.preparePasteDirect(options);
+    await this.writeToClipboard(clipboardItem, options);
   }
 }

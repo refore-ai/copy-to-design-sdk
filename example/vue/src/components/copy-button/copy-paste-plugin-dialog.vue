@@ -26,8 +26,9 @@ const API_ENDPOINT = import.meta.env.VITE_COPY_TO_DESIGN_ENDPOINT
   : undefined;
 
 const isExporting = ref(false);
-const exportResult = ref<'success' | 'error' | null>(null);
+const exportStatus = ref<'success' | 'error' | 'waiting-user' | null>(null);
 const videoRef = ref<HTMLVideoElement>();
+const copyHandler = ref<Function | null>(null);
 
 const videoSource = computed(() => {
   const platform = props.selectedOption.id as keyof typeof DESIGN_APPS;
@@ -37,17 +38,17 @@ const videoSource = computed(() => {
 const closeDialog = () => {
   open.value = false;
   emit('close');
-  exportResult.value = null;
+  exportStatus.value = null;
 };
 
 const handleExport = async () => {
   if (!props.exportContent) {
-    exportResult.value = 'error';
+    exportStatus.value = 'error';
     return;
   }
 
   isExporting.value = true;
-  exportResult.value = null;
+  exportStatus.value = null;
 
   try {
     const { CopyToDesign } = await import('@refore-ai/copy-to-design-sdk');
@@ -63,12 +64,29 @@ const handleExport = async () => {
       height: props.exportContent.height,
       platform: props.selectedOption.id as PlatformType,
       importMode: props.exportContent.importMode,
+      onWaitingForFocus: async () => {
+        // debugger;
+        if ('Notification' in window && Notification.permission === 'default') {
+          await Notification.requestPermission();
+        }
+
+        if ('Notification' in window && Notification.permission !== 'denied') {
+          new Notification('Data Ready', {
+            body: 'Data is ready, please return to the page to continue',
+            icon: '/favicon.ico',
+          });
+        }
+      },
+      onUserActionRequired: (writeClipboard) => {
+        exportStatus.value = 'waiting-user';
+        copyHandler.value = writeClipboard;
+      },
     });
 
-    exportResult.value = 'success';
+    exportStatus.value = 'success';
   } catch (error: unknown) {
     console.error('Export failed:', error);
-    exportResult.value = 'error';
+    exportStatus.value = 'error';
   } finally {
     isExporting.value = false;
   }
@@ -130,7 +148,7 @@ const openPluginPage = () => {
 
       <div class="flex h-[220px] items-center justify-center">
         <div class="p-4 text-center">
-          <div v-if="exportResult === 'success'">
+          <div v-if="exportStatus === 'success'">
             <SuccessAnimation message="Copying successful" />
             <div class="mt-3 text-lg font-medium">
               {{
@@ -153,8 +171,12 @@ const openPluginPage = () => {
             </div>
           </div>
 
-          <div v-else-if="exportResult === 'error'" class="h-[40px] text-lg font-medium text-red-700">
+          <div v-else-if="exportStatus === 'error'" class="h-[40px] text-lg font-medium text-red-700">
             Export failed
+          </div>
+
+          <div v-else-if="exportStatus === 'waiting-user'" class="">
+            <Button @click="copyHandler">Click to copy</Button>
           </div>
 
           <div v-else-if="isExporting" class="h-[40px] text-lg font-medium">
@@ -163,7 +185,7 @@ const openPluginPage = () => {
 
           <div class="mt-2">
             <Button
-              v-if="exportResult === 'error'"
+              v-if="exportStatus === 'error'"
               class="bg-gray-900 px-6 py-2 text-white hover:bg-gray-800"
               @click="tryAgain"
             >

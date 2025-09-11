@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { PlatformType } from '@refore-ai/copy-to-design-sdk';
 
 import SuccessAnimation from '../animation/SuccessAnimation.vue';
 import type { ButtonOption } from '../selectable-button/types';
 import { Dialog, DialogContent } from '../ui/dialog';
 import type { ExportContent } from './type';
-import { DESIGN_APPS } from './type';
 import { Button } from '../ui/button';
 
 const props = defineProps<{
@@ -26,7 +25,9 @@ const API_ENDPOINT = import.meta.env.VITE_COPY_TO_DESIGN_ENDPOINT
   : undefined;
 
 const isExporting = ref(false);
-const exportResult = ref<'success' | 'error' | null>(null);
+const exportStatus = ref<'success' | 'error' | 'waiting-user' | null>(null);
+const copyHandler = ref<Function | null>(null);
+
 // const videoRef = ref<HTMLVideoElement>();
 
 // const videoSource = computed(() => {
@@ -37,17 +38,17 @@ const exportResult = ref<'success' | 'error' | null>(null);
 const closeDialog = () => {
   open.value = false;
   emit('close');
-  exportResult.value = null;
+  exportStatus.value = null;
 };
 
 const handleExport = async () => {
   if (!props.exportContent) {
-    exportResult.value = 'error';
+    exportStatus.value = 'error';
     return;
   }
 
   isExporting.value = true;
-  exportResult.value = null;
+  exportStatus.value = null;
 
   try {
     const { CopyToDesign } = await import('@refore-ai/copy-to-design-sdk');
@@ -75,12 +76,16 @@ const handleExport = async () => {
           });
         }
       },
+      onUserActionRequired: (writeClipboard) => {
+        exportStatus.value = 'waiting-user';
+        copyHandler.value = writeClipboard;
+      },
     });
 
-    exportResult.value = 'success';
+    exportStatus.value = 'success';
   } catch (error: unknown) {
     console.error('Export failed:', error);
-    exportResult.value = 'error';
+    exportStatus.value = 'error';
   } finally {
     isExporting.value = false;
   }
@@ -129,15 +134,19 @@ const tryAgain = () => {
 
       <div class="flex h-[220px] items-center justify-center">
         <div class="p-4 text-center">
-          <div v-if="exportResult === 'success'">
+          <div v-if="exportStatus === 'success'">
             <SuccessAnimation message="Copying successful" />
             <div class="mt-2 text-[14px]">
               {{ `You can press Command + V to directly paste the content to the ${props.selectedOption.id} canvas.` }}
             </div>
           </div>
 
-          <div v-else-if="exportResult === 'error'" class="h-[40px] text-lg font-medium text-red-700">
+          <div v-else-if="exportStatus === 'error'" class="h-[40px] text-lg font-medium text-red-700">
             Export failed
+          </div>
+
+          <div v-else-if="exportStatus === 'waiting-user'" class="">
+            <Button @click="copyHandler">Click to copy</Button>
           </div>
 
           <div v-else-if="isExporting" class="h-[40px] text-lg font-medium">
@@ -146,7 +155,7 @@ const tryAgain = () => {
 
           <div class="mt-2">
             <Button
-              v-if="exportResult === 'error'"
+              v-if="exportStatus === 'error'"
               class="bg-gray-900 px-6 py-2 text-white hover:bg-gray-800"
               @click="tryAgain"
             >
