@@ -170,7 +170,7 @@ export class CopyToDesign {
   }
 
   async writeToClipboard(clipboardItem: ClipboardItem, options: ICopyCommonOption = {}) {
-    const { onWaitingForFocus, onUserActionRequired: onNotTransientActive } = options;
+    const { onWaitingForFocus, onUserActionRequired } = options;
 
     // check document is focused
     if (!document.hasFocus()) {
@@ -204,7 +204,7 @@ export class CopyToDesign {
     if (permission !== 'not-support') {
       await writeClipboard();
     } else {
-      onNotTransientActive?.(writeClipboard);
+      onUserActionRequired?.(writeClipboard);
     }
 
     await writeClipboardDefer.promise;
