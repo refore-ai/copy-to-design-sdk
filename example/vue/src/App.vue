@@ -57,7 +57,7 @@ const viewMode = ref('preview');
             rel="noopener noreferrer"
             class="text-lg font-semibold h-auto px-3 py-1.5 rounded-md transition-colors hover:text-primary flex items-center"
           >
-            <img src="/logo/demoway/refore.svg" class="h-5 w-5 mr-1" />
+            <img src="/logo/refore.svg" class="h-5 w-5 mr-1" />
             Refore Copy to Design SDK
           </Button>
         </div>
