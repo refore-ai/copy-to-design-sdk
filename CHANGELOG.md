@@ -1,3 +1,8 @@
+## 1.3.0 (2025-09-12)
+
+feat: compatible with Safari by user action handling and permission checks ([d5555c0](https://github.com/refore-ai/copy-to-design-sdk/commit/d5555c09625ab27a9c1a8a9d99e77cdc80be2bdd))
+feat: add copyPasteDirect method by @kainstar in ([#14](https://github.com/refore-ai/copy-to-design-sdk/pull/14))
+
 ## 1.2.0 (2025-09-05)
 
 * fix: use copyPasteInPlugin replace copyToClipboardFromHTML ([44aaf44](https://github.com/refore-ai/copy-to-design-sdk/commit/44aaf44))
