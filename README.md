@@ -1,6 +1,6 @@
 # @refore-ai/copy-to-design-sdk
 
-Import HTML pages into design tools like Figma via simple copy and paste.
+By integrating this Refore Copy to Design SDK, your AI design tool can enable users to import HTML pages into Figma with a simple copy and paste.
 
 ## Install
 
