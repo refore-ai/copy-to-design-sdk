@@ -30,9 +30,15 @@ const exportStatus = ref<'success' | 'error' | 'waiting-user' | null>(null);
 const videoRef = ref<HTMLVideoElement>();
 const copyHandler = ref<Function | null>(null);
 
+const platform = computed(() => props.selectedOption.id as keyof typeof DESIGN_APPS);
+const platformName = computed(() => DESIGN_APPS[platform.value]?.title);
+
+// Detect platform-specific paste shortcut
+const isMac = computed(() => /mac/i.test(navigator.platform) || /Mac|iPhone|iPad|iPod/.test(navigator.userAgent));
+const pasteShortcut = computed(() => (isMac.value ? '⌘ + V' : 'Ctrl + V'));
+
 const videoSource = computed(() => {
-  const platform = props.selectedOption.id as keyof typeof DESIGN_APPS;
-  return DESIGN_APPS[platform]?.video || '/video/test.mp4';
+  return DESIGN_APPS[platform.value]?.video || '/video/test.mp4';
 });
 
 const closeDialog = () => {
@@ -107,16 +113,15 @@ const tryAgain = () => {
 
 // Function to open plugin page
 const openPluginPage = () => {
-  const platform = props.selectedOption.id as keyof typeof DESIGN_APPS;
-  if (DESIGN_APPS[platform]?.plugin) {
-    window.open(DESIGN_APPS[platform].plugin, '_blank');
+  if (DESIGN_APPS[platform.value]?.plugin) {
+    window.open(DESIGN_APPS[platform.value].plugin, '_blank');
   }
 };
 </script>
 
 <template>
   <Dialog v-model:open="open" @update:open="(value: boolean) => !value && closeDialog()">
-    <DialogContent class="max-h-[90vh] min-w-[600px] overflow-hidden p-0 transition-all duration-200">
+    <DialogContent class="max-h-[90vh] min-w-[600px] overflow-hidden p-0 transition-all duration-200 gap-0">
       <div class="relative aspect-video overflow-hidden bg-gray-100">
         <video ref="videoRef" class="h-full w-full object-cover" controls autoplay loop>
           <source :src="videoSource" type="video/mp4" />
@@ -146,52 +151,41 @@ const openPluginPage = () => {
         </div>
       </div>
 
-      <div class="flex h-[220px] items-center justify-center">
-        <div class="p-4 text-center">
-          <div v-if="exportStatus === 'success'">
-            <SuccessAnimation message="Copying successful" />
-            <div class="mt-3 text-lg font-medium">
-              {{
-                props.selectedOption.id === 'Figma'
-                  ? 'Open Copy to Figma plugin in Figma canvas, press Command + V \n to paste the content to canvas'
-                  : 'Open Copy to Design plugin in design canvas, press Command + V \n to paste the content to canvas'
-              }}
-            </div>
-            <div class="mt-2">
-              <Button class="bg-gray-900 px-6 py-2 text-white hover:bg-gray-800" @click="openPluginPage">
-                {{ props.selectedOption.id === 'Figma' ? 'Copy to Figma plugin' : 'Copy to Design plugin' }}
-              </Button>
-            </div>
-            <div class="mt-2 text-[14px]">
-              {{
-                `You can directly search for and open the ${
-                  props.selectedOption.id === 'Figma' ? 'Copy to Figma' : 'Copy to Design'
-                } plugin within the Figma canvas.`
-              }}
-            </div>
+      <div class="flex p-4 items-center justify-center text-center">
+        <div v-if="exportStatus === 'success'">
+          <SuccessAnimation message="Copying successful" />
+          <div class="mt-3 whitespace-pre-line font-medium">
+            {{
+              props.selectedOption.id === 'Figma'
+                ? `Open Copy to Figma plugin in Figma\nPress ${pasteShortcut} to paste as an editable design draft`
+                : `Open Copy to Design plugin in ${platformName}\nPress ${pasteShortcut} to paste as an editable design draft`
+            }}
           </div>
-
-          <div v-else-if="exportStatus === 'error'" class="h-[40px] text-lg font-medium text-red-700">
-            Export failed
-          </div>
-
-          <div v-else-if="exportStatus === 'waiting-user'" class="">
-            <Button @click="copyHandler">Click to copy</Button>
-          </div>
-
-          <div v-else-if="isExporting" class="h-[40px] text-lg font-medium">
-            Copying to {{ props.selectedOption.title }}...
-          </div>
-
           <div class="mt-2">
-            <Button
-              v-if="exportStatus === 'error'"
-              class="bg-gray-900 px-6 py-2 text-white hover:bg-gray-800"
-              @click="tryAgain"
-            >
-              Try again
+            <Button class="bg-gray-900 px-6 py-2 text-white hover:bg-gray-800" @click="openPluginPage">
+              Open Plugin
             </Button>
           </div>
+        </div>
+
+        <div v-else-if="exportStatus === 'error'" class="h-[40px] text-lg font-medium text-red-700">Export failed</div>
+
+        <div v-else-if="exportStatus === 'waiting-user'" class="">
+          <Button @click="copyHandler">Click to copy</Button>
+        </div>
+
+        <div v-else-if="isExporting" class="h-[40px] text-lg font-medium">
+          Copying to {{ props.selectedOption.title }}...
+        </div>
+
+        <div class="mt-2">
+          <Button
+            v-if="exportStatus === 'error'"
+            class="bg-gray-900 px-6 py-2 text-white hover:bg-gray-800"
+            @click="tryAgain"
+          >
+            Try again
+          </Button>
         </div>
       </div>
     </DialogContent>
