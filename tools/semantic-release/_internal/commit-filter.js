@@ -1,4 +1,3 @@
-import { analyzeCommits as DEFAULT_analyzeCommits } from '@semantic-release/commit-analyzer';
 import { minimatch } from 'minimatch';
 import { execSync } from 'node:child_process';
 
@@ -10,7 +9,7 @@ const ChangeTypesMap = {
   R: 'renamed',
 };
 
-const ALLOW_RELEASE_PATTERNS = ['src/**/*', 'README.md'];
+const ALLOW_RELEASE_PATTERNS = ['src/**/*', 'package.json', 'README.md'];
 
 function getGitChangedFiles(commit) {
   const result = execSync(`git diff-tree --no-commit-id --name-status --diff-filter=ACDMR -r ${commit}`, {
