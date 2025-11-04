@@ -1,3 +1,7 @@
+## 1.4.0 (2025-11-04)
+
+* feat: allow custom attrs for plugin receive data ([2cce0bf](https://github.com/refore-ai/copy-to-design-sdk/commit/2cce0bf))
+
 ## <small>1.3.1 (2025-09-23)</small>
 
 * fix: add package.json main field ([89164db](https://github.com/refore-ai/copy-to-design-sdk/commit/89164db))
