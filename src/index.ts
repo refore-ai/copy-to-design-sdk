@@ -31,7 +31,7 @@ interface IGeneratePluginDataOptions {
   attrs?: Record<string, string>;
 }
 
-export interface IPreparePasteInPluginOptions extends Omit<IGeneratePluginDataOptions, 'attrs'> {
+export interface IPreparePasteInPluginOptions extends IGeneratePluginDataOptions {
   content: string | string[];
 }
 
@@ -54,6 +54,7 @@ export interface IPreparePasteDirectOptions {
   width: number;
   height: number;
   platform: PlatformType.MasterGo;
+  attrs?: Record<string, string>;
 }
 
 export interface ICopyPasteDirectOptions extends IPreparePasteDirectOptions, ICopyCommonOption {}
@@ -238,7 +239,7 @@ export class CopyToDesign {
   }
 
   async preparePasteDirect(options: IPreparePasteDirectOptions) {
-    const { platform, content, width, height } = options;
+    const { platform, content, width, height, attrs } = options;
 
     const endpoint = this.getEndpointByPlatform(platform);
 
@@ -260,6 +261,7 @@ export class CopyToDesign {
         platform,
         attrs: {
           'data-rpa': 'true',
+          ...attrs,
         },
       });
 
