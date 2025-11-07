@@ -58,6 +58,7 @@ Copies HTML content to clipboard in a format that can be pasted into design tool
 | `width` | `number` | No | - | Width of the page viewport in pixels. |
 | `height` | `number` | No | - | Height of the page viewport in pixels. |
 | `importMode` | `ImportMode` | No | `ImportMode.Interactive` | Import mode. One of: `ImportMode.Interactive` (user can adjust import settings), `ImportMode.Quick` (direct import) |
+| `topLayerName.referrer` | `false \| string` | No | `location.origin` | Imported page's top layer name's referrer part |
 
 #### Example
 

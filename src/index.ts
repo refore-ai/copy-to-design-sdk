@@ -29,6 +29,9 @@ interface IGeneratePluginDataOptions {
   importMode?: ImportMode;
   platform: PlatformType;
   attrs?: Record<string, string>;
+  topLayerName?: {
+    referrer?: false | string;
+  };
 }
 
 export interface IPreparePasteInPluginOptions extends IGeneratePluginDataOptions {
@@ -49,12 +52,8 @@ export interface ICopyCommonOption {
 
 export interface ICopyPasteInPluginOptions extends IPreparePasteInPluginOptions, ICopyCommonOption {}
 
-export interface IPreparePasteDirectOptions {
-  content: string | string[];
-  width: number;
-  height: number;
+export interface IPreparePasteDirectOptions extends Omit<IPreparePasteInPluginOptions, 'platform' | 'importMode'> {
   platform: PlatformType.MasterGo;
-  attrs?: Record<string, string>;
 }
 
 export interface ICopyPasteDirectOptions extends IPreparePasteDirectOptions, ICopyCommonOption {}
@@ -141,7 +140,7 @@ export class CopyToDesign {
   }
 
   private async generatePluginReceiveDataForHTML(html: string | string[], options: IGeneratePluginDataOptions) {
-    const { platform, importMode = ImportMode.Interactive, width, height, attrs = {} } = options;
+    const { platform, importMode = ImportMode.Interactive, width, height, attrs = {}, topLayerName } = options;
 
     const endpoint = this.getEndpointByPlatform(platform);
 
@@ -162,6 +161,9 @@ export class CopyToDesign {
     div.setAttribute('data-copy-sdk-version', VERSION);
     div.setAttribute('data-copy-endpoint', endpoint);
     div.setAttribute('data-copy-content', encrypted.toString());
+
+    const resolvedTopLayerName = Object.assign({ referrer: location.origin }, topLayerName);
+    div.setAttribute('data-copy-top-layer-name', JSON.stringify(resolvedTopLayerName));
 
     for (const key of Object.keys(attrs)) {
       div.setAttribute(key, attrs[key]);
@@ -239,7 +241,7 @@ export class CopyToDesign {
   }
 
   async preparePasteDirect(options: IPreparePasteDirectOptions) {
-    const { platform, content, width, height, attrs } = options;
+    const { platform, content, width, height, attrs, topLayerName } = options;
 
     const endpoint = this.getEndpointByPlatform(platform);
 
@@ -259,6 +261,7 @@ export class CopyToDesign {
         width,
         height,
         platform,
+        topLayerName,
         attrs: {
           'data-rpa': 'true',
           ...attrs,

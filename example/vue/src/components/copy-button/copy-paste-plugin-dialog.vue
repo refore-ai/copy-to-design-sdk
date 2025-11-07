@@ -70,6 +70,9 @@ const handleExport = async () => {
       height: props.exportContent.height,
       platform: props.selectedOption.id as PlatformType,
       importMode: props.exportContent.importMode,
+      topLayerName: {
+        referrer: false,
+      },
       onWaitingForFocus: async () => {
         // debugger;
         if ('Notification' in window && Notification.permission === 'default') {
