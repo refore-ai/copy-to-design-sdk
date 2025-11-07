@@ -1,3 +1,7 @@
+## 1.5.0 (2025-11-07)
+
+* feat: support customize top layer name referrer part ([e4a4b8a](https://github.com/refore-ai/copy-to-design-sdk/commit/e4a4b8a))
+
 ## 1.4.0 (2025-11-04)
 
 * feat: allow custom attrs for plugin receive data ([2cce0bf](https://github.com/refore-ai/copy-to-design-sdk/commit/2cce0bf))
