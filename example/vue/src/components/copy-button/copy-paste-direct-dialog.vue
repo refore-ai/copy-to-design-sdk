@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { PlatformType } from '@refore-ai/copy-to-design-sdk';
+import { PlatformType, Region } from '@refore-ai/copy-to-design-sdk';
 
 import SuccessAnimation from '../animation/SuccessAnimation.vue';
 import type { ButtonOption } from '../selectable-button/types';
 import { Dialog, DialogContent } from '../ui/dialog';
 import type { ExportContent } from './type';
 import { Button } from '../ui/button';
+import { createCopyToDesign } from './utils';
 
 const props = defineProps<{
   selectedOption: ButtonOption;
@@ -19,21 +20,9 @@ const emit = defineEmits<{
 
 const open = defineModel<boolean>('open');
 
-const API_KEY = import.meta.env.VITE_COPY_TO_DESIGN_KEY;
-const API_ENDPOINT = import.meta.env.VITE_COPY_TO_DESIGN_ENDPOINT
-  ? () => import.meta.env.VITE_COPY_TO_DESIGN_ENDPOINT
-  : undefined;
-
 const isExporting = ref(false);
 const exportStatus = ref<'success' | 'error' | 'waiting-user' | null>(null);
 const copyHandler = ref<Function | null>(null);
-
-// const videoRef = ref<HTMLVideoElement>();
-
-// const videoSource = computed(() => {
-//   const platform = props.selectedOption.id as keyof typeof DESIGN_APPS;
-//   return DESIGN_APPS[platform]?.video || '/video/test.mp4';
-// });
 
 const closeDialog = () => {
   open.value = false;
@@ -51,12 +40,7 @@ const handleExport = async () => {
   exportStatus.value = null;
 
   try {
-    const { CopyToDesign } = await import('@refore-ai/copy-to-design-sdk');
-
-    const copyToDesign = new CopyToDesign({
-      key: API_KEY,
-      _endpoint: API_ENDPOINT,
-    });
+    const copyToDesign = await createCopyToDesign();
 
     await copyToDesign.copyPasteDirect({
       content: props.exportContent.html,
@@ -132,7 +116,7 @@ const tryAgain = () => {
         </div>
       </div>
 
-      <div class="flex h-[220px] items-center justify-center">
+      <div class="flex flex-col h-[220px] items-center justify-center">
         <div class="p-4 text-center">
           <div v-if="exportStatus === 'success'">
             <SuccessAnimation message="Copying successful" />

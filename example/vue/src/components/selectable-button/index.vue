@@ -15,12 +15,9 @@ import type { ButtonOption } from './types';
 interface SelectableButtonProps {
   config: Record<string, ButtonOption>;
   onSelect?: (option: ButtonOption) => void;
-  fixedWidth?: boolean;
 }
 
-const props = withDefaults(defineProps<SelectableButtonProps>(), {
-  fixedWidth: true,
-});
+const props = defineProps<SelectableButtonProps>();
 
 const modelValue = defineModel<string>('modelValue', { default: '' });
 
@@ -58,25 +55,6 @@ const handleMainButtonClick = () => {
     props.onSelect(selectedOption.value);
   }
 };
-
-const buttonStyle = computed(() => {
-  if (!props.fixedWidth) return {};
-
-  const longestTitle = [...allExportOptions.value].sort((a, b) => b.title.length - a.title.length)[0]?.title || '';
-
-  const width = Math.max(longestTitle.length * 8 + 40, 120);
-  return { width: `${width}px` };
-});
-
-const dropdownStyle = computed(() => {
-  if (!props.fixedWidth) return {};
-
-  const longestTitle = [...allExportOptions.value].sort((a, b) => b.title.length - a.title.length)[0]?.title || '';
-
-  const buttonWidth = Math.max(longestTitle.length * 8 + 40, 120);
-  const totalWidth = buttonWidth + 24;
-  return { width: `${totalWidth}px` };
-});
 </script>
 
 <template>
@@ -87,7 +65,6 @@ const dropdownStyle = computed(() => {
         <Button
           variant="outline"
           class="h-8 flex-1 justify-start rounded-none border-0 bg-white px-2 text-left text-xs font-normal hover:rounded-none"
-          :style="buttonStyle"
           @click="handleMainButtonClick"
         >
           <div class="flex items-center gap-1.5">
@@ -120,7 +97,7 @@ const dropdownStyle = computed(() => {
         align="end"
         side="bottom"
       >
-        <div :style="dropdownStyle">
+        <div>
           <DropdownMenuItem
             v-for="option in availableDropdownOptions"
             :key="option.id"
