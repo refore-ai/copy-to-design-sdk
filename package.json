@@ -51,7 +51,8 @@
     "nanoid": "^5.1.5",
     "ofetch": "^1.4.1",
     "radashi": "^12.6.2",
-    "socket.io-client": "^4.8.1"
+    "socket.io-client": "^4.8.1",
+    "type-fest": "^5.3.1"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^5.2.1",

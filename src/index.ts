@@ -5,38 +5,35 @@ import type { FetchContext } from 'ofetch';
 import { createFetch } from 'ofetch';
 import { withResolvers } from 'radashi';
 import type { Socket } from 'socket.io-client';
+import type { Promisable } from 'type-fest';
 
 import { version as VERSION } from '../package.json';
+import type { PlatformType } from './enum';
+import { ImportMode, Region } from './enum';
 import { getPermission } from './permission';
-import type { ISocketAuthPayload } from './socket-manager';
 import { SocketManager } from './socket-manager';
 
-export enum PlatformType {
-  Figma = 'figma',
-  MasterGo = 'mastergo',
-  JSDesign = 'jsdesign',
-  PixsoChina = 'pixso-china',
+export interface IAuthorizationPayload {
+  accessToken: string;
+  appId: string;
 }
 
-export enum ImportMode {
-  Quick = 'quick',
-  Interactive = 'interactive',
-}
+export * from './enum';
 
-interface IGeneratePluginDataOptions {
+export interface IGeneratePluginDataOptions {
+  content: string | string[];
   width?: number;
   height?: number;
   importMode?: ImportMode;
   platform: PlatformType;
   attrs?: Record<string, string>;
+  copyInfo?: Record<string, any>;
   topLayerName?: {
     referrer?: false | string;
   };
 }
 
-export interface IPreparePasteInPluginOptions extends IGeneratePluginDataOptions {
-  content: string | string[];
-}
+export interface IPreparePasteInPluginOptions extends IGeneratePluginDataOptions {}
 
 export interface ICopyCommonOption {
   /**
@@ -59,9 +56,10 @@ export interface IPreparePasteDirectOptions extends Omit<IPreparePasteInPluginOp
 export interface ICopyPasteDirectOptions extends IPreparePasteDirectOptions, ICopyCommonOption {}
 
 export interface CopyToDesignOptions {
-  key: string;
+  region: Region;
+  getAuthorizationPayload: () => Promisable<IAuthorizationPayload>;
   /** For internal development use only */
-  _endpoint?: (platform: PlatformType) => string;
+  _endpoint?: (region: Region) => string;
 }
 
 const COPY_TO_DESIGN_SDK_RESOURCE_TYPE = 'CopyToDesignSDK';
@@ -71,8 +69,8 @@ interface ICopyToDesignSDKResourceEventPayload {
   content: string;
 }
 
-const DEFAULT_GET_ENDPOINT = (platform: PlatformType) =>
-  platform === PlatformType.Figma ? 'https://api.demoway.com' : 'https://api.demoway.cn';
+const DEFAULT_GET_ENDPOINT = (region: Region) =>
+  region === Region.World ? 'https://api.demoway.com' : 'https://api.demoway.cn';
 
 export class CopyToDesign {
   private thumbmark = new Thumbmark();
@@ -84,14 +82,17 @@ export class CopyToDesign {
       onRequest: async (context) => {
         const headers = context.options.headers;
         const visitorId = await this.getVisitorId();
+        const payload = await this.getAuthorizationPayload();
 
         context.options.query = {
           ...context.options.query,
-          visitorId,
+          client: 'copy-to-design-sdk',
           version: VERSION,
+          visitorId,
+          appId: payload.appId,
         };
 
-        headers.set('Authorization', `Basic ${btoa(JSON.stringify(this.getAuthorizationPayload()))}`);
+        headers.set('Authorization', `Bearer ${payload.accessToken}`);
       },
       async onResponse(context: FetchContext) {
         if (context.error) {
@@ -113,21 +114,15 @@ export class CopyToDesign {
     },
   });
 
-  constructor(private options: CopyToDesignOptions) {
-    if (!this.options.key) {
-      throw new Error('options.key is Required');
-    }
-  }
+  constructor(private options: CopyToDesignOptions) {}
 
   private getAuthorizationPayload() {
-    const url = window.location.href;
-
-    return { url, key: this.options.key };
+    return this.options.getAuthorizationPayload();
   }
 
-  private getEndpointByPlatform(platform: PlatformType) {
+  private getEndpointByRegion(region: Region) {
     const getEndPoint = this.options?._endpoint ?? DEFAULT_GET_ENDPOINT;
-    return getEndPoint(platform);
+    return getEndPoint(region);
   }
 
   private async getVisitorId() {
@@ -139,20 +134,31 @@ export class CopyToDesign {
     return this.visitorId;
   }
 
-  private async generatePluginReceiveDataForHTML(html: string | string[], options: IGeneratePluginDataOptions) {
-    const { platform, importMode = ImportMode.Interactive, width, height, attrs = {}, topLayerName } = options;
+  private async generatePluginReceiveDataForHTML(options: IGeneratePluginDataOptions) {
+    const {
+      content,
+      platform,
+      importMode = ImportMode.Interactive,
+      width,
+      height,
+      attrs = {},
+      topLayerName,
+      copyInfo,
+    } = options;
 
-    const endpoint = this.getEndpointByPlatform(platform);
+    const endpoint = this.getEndpointByRegion(this.options.region);
 
-    const source = JSON.stringify({ type: 'html', html, importMode, width, height });
+    const source = JSON.stringify({ type: 'html', html: content, importMode, width, height });
     const secret = nanoid(32);
     const encrypted = CryptoJS.AES.encrypt(source, secret);
 
-    const res = await this.$fetch<{ copyId: string }>('/api/refore/copy-to-design/save-copy-info', {
+    const res = await this.$fetch<{ copyId: string }>('/api/refore/copy-to-design-v2/save-copy-info', {
       baseURL: endpoint,
       method: 'POST',
       body: {
+        ...copyInfo,
         secret,
+        platform,
       },
     });
 
@@ -214,8 +220,7 @@ export class CopyToDesign {
   }
 
   async preparePasteInPlugin(options: IPreparePasteInPluginOptions) {
-    const { content, ...restOptions } = options;
-    const data = await this.generatePluginReceiveDataForHTML(content, restOptions);
+    const data = await this.generatePluginReceiveDataForHTML(options);
 
     const clipboardItem = new ClipboardItem({
       'text/html': new Blob([data], { type: 'text/html' }),
@@ -241,34 +246,30 @@ export class CopyToDesign {
   }
 
   async preparePasteDirect(options: IPreparePasteDirectOptions) {
-    const { platform, content, width, height, attrs, topLayerName } = options;
+    const { platform, ...rest } = options;
 
-    const endpoint = this.getEndpointByPlatform(platform);
-
-    const authPayload: ISocketAuthPayload = {
-      type: 'refore-key',
-      ...this.getAuthorizationPayload(),
-    };
+    const endpoint = this.getEndpointByRegion(this.options.region);
 
     let connection: Socket | null = null;
     let taskId: string | null = null;
 
     try {
-      connection = await this.socketManager.getOrCreateConnection(endpoint, authPayload);
+      const authorizationPayload = await this.getAuthorizationPayload();
+      connection = await this.socketManager.getOrCreateConnection(endpoint, {
+        accessToken: authorizationPayload.accessToken,
+      });
 
-      const pluginReceiveData = await this.generatePluginReceiveDataForHTML(content, {
+      const pluginReceiveData = await this.generatePluginReceiveDataForHTML({
         importMode: ImportMode.Quick,
-        width,
-        height,
         platform,
-        topLayerName,
+        ...rest,
         attrs: {
+          ...rest.attrs,
           'data-rpa': 'true',
-          ...attrs,
         },
       });
 
-      ({ taskId } = await this.$fetch<{ taskId: string }>('/api/refore/copy-to-design/generate-paste-direct-data', {
+      ({ taskId } = await this.$fetch<{ taskId: string }>('/api/refore/copy-to-design-v2/generate-paste-direct-data', {
         baseURL: endpoint,
         method: 'POST',
         body: {

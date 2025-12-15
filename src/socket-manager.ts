@@ -23,9 +23,7 @@ export interface IResourceSubscribeEvent<T> {
 }
 
 export interface ISocketAuthPayload {
-  type: string;
-  url: string;
-  key: string;
+  accessToken: string;
 }
 
 /**
