@@ -59,7 +59,7 @@ export interface CopyToDesignOptions {
   region: Region;
   getAuthorizationPayload: () => Promisable<IAuthorizationPayload>;
   /** For internal development use only */
-  _endpoint?: (region: Region) => string;
+  _server?: (region: Region) => string;
 }
 
 const COPY_TO_DESIGN_SDK_RESOURCE_TYPE = 'CopyToDesignSDK';
@@ -69,7 +69,7 @@ interface ICopyToDesignSDKResourceEventPayload {
   content: string;
 }
 
-const DEFAULT_GET_ENDPOINT = (region: Region) =>
+const DEFAULT_GET_SERVER = (region: Region) =>
   region === Region.World ? 'https://api.demoway.com' : 'https://api.demoway.cn';
 
 export class CopyToDesign {
@@ -120,9 +120,9 @@ export class CopyToDesign {
     return this.options.getAuthorizationPayload();
   }
 
-  private getEndpointByRegion(region: Region) {
-    const getEndPoint = this.options?._endpoint ?? DEFAULT_GET_ENDPOINT;
-    return getEndPoint(region);
+  private getServerByRegion(region: Region) {
+    const getServer = this.options?._server ?? DEFAULT_GET_SERVER;
+    return getServer(region);
   }
 
   private async getVisitorId() {
@@ -146,14 +146,14 @@ export class CopyToDesign {
       copyInfo,
     } = options;
 
-    const endpoint = this.getEndpointByRegion(this.options.region);
+    const server = this.getServerByRegion(this.options.region);
 
     const source = JSON.stringify({ type: 'html', html: content, importMode, width, height });
     const secret = nanoid(32);
     const encrypted = CryptoJS.AES.encrypt(source, secret);
 
     const res = await this.$fetch<{ copyId: string }>('/api/refore/copy-to-design-v2/save-copy-info', {
-      baseURL: endpoint,
+      baseURL: server,
       method: 'POST',
       body: {
         ...copyInfo,
@@ -165,7 +165,7 @@ export class CopyToDesign {
     const div = document.createElement('refore-copy-to-design');
     div.setAttribute('data-copy-id', res.copyId);
     div.setAttribute('data-copy-sdk-version', VERSION);
-    div.setAttribute('data-copy-endpoint', endpoint);
+    div.setAttribute('data-copy-server', server);
     div.setAttribute('data-copy-content', encrypted.toString());
 
     const resolvedTopLayerName = Object.assign({ referrer: location.origin }, topLayerName);
@@ -248,14 +248,14 @@ export class CopyToDesign {
   async preparePasteDirect(options: IPreparePasteDirectOptions) {
     const { platform, ...rest } = options;
 
-    const endpoint = this.getEndpointByRegion(this.options.region);
+    const server = this.getServerByRegion(this.options.region);
 
     let connection: Socket | null = null;
     let taskId: string | null = null;
 
     try {
       const authorizationPayload = await this.getAuthorizationPayload();
-      connection = await this.socketManager.getOrCreateConnection(endpoint, {
+      connection = await this.socketManager.getOrCreateConnection(server, {
         accessToken: authorizationPayload.accessToken,
       });
 
@@ -270,7 +270,7 @@ export class CopyToDesign {
       });
 
       ({ taskId } = await this.$fetch<{ taskId: string }>('/api/refore/copy-to-design-v2/generate-paste-direct-data', {
-        baseURL: endpoint,
+        baseURL: server,
         method: 'POST',
         body: {
           platform,
@@ -300,7 +300,7 @@ export class CopyToDesign {
 
       if (connection) {
         // Release connection (but keep it alive for reuse)
-        this.socketManager.releaseConnection(endpoint);
+        this.socketManager.releaseConnection(server);
       }
     }
   }

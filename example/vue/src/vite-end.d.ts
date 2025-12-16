@@ -9,7 +9,7 @@ interface ViteTypeOptions {
 interface ImportMetaEnv {
   readonly VITE_COPY_TO_DESIGN_ACCESS_TOKEN: string;
   readonly VITE_COPY_TO_DESIGN_APP_ID: string;
-  readonly VITE_COPY_TO_DESIGN_ENDPOINT: string;
+  readonly VITE_COPY_TO_DESIGN_SERVER: string;
   // more env variables...
 }
 

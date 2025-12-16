@@ -2,8 +2,8 @@ import { Region } from '@refore-ai/copy-to-design-sdk';
 
 const ACCESS_TOKEN = import.meta.env.VITE_COPY_TO_DESIGN_ACCESS_TOKEN;
 const APP_ID = import.meta.env.VITE_COPY_TO_DESIGN_APP_ID;
-const API_ENDPOINT = import.meta.env.VITE_COPY_TO_DESIGN_ENDPOINT
-  ? () => import.meta.env.VITE_COPY_TO_DESIGN_ENDPOINT
+const API_SERVER = import.meta.env.VITE_COPY_TO_DESIGN_SERVER
+  ? () => import.meta.env.VITE_COPY_TO_DESIGN_SERVER
   : undefined;
 
 export async function createCopyToDesign() {
@@ -17,7 +17,7 @@ export async function createCopyToDesign() {
         appId: APP_ID,
       };
     },
-    _endpoint: API_ENDPOINT,
+    _server: API_SERVER,
   });
 
   return copyToDesign;
