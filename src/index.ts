@@ -57,6 +57,10 @@ export interface ICopyPasteDirectOptions extends IPreparePasteDirectOptions, ICo
 
 export interface CopyToDesignOptions {
   region: Region;
+  /**
+   * `getAuthorizationPayload` is called before each network request to get the latest authorization info, so you have to make cache yourself if needed
+   * @returns
+   */
   getAuthorizationPayload: () => Promisable<IAuthorizationPayload>;
   /** For internal development use only */
   _server?: (region: Region) => string;
