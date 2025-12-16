@@ -33,8 +33,8 @@
     "lint": "eslint src",
     "prepublishOnly": "pnpm run build",
     "release": "semantic-release --no-ci",
-    "vue-example:install": "pnpm --filter vue-example install",
-    "vue-example:dev": "pnpm --filter vue-example dev"
+    "example:install": "cd example && pnpm install",
+    "example:dev": "cd example && pnpm dev"
   },
   "publishConfig": {
     "access": "public",
