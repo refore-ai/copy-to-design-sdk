@@ -4,7 +4,7 @@
 export default {
   dryRun: false,
   debug: false,
-  branches: ['main', { name: 'v2', prerelease: 'beta' }],
+  branches: ['main', { name: 'v2', channel: 'beta', prerelease: 'beta' }],
   plugins: [
     [
       './tools/semantic-release/commit-analyzer.js',
