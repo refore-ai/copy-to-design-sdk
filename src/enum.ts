@@ -1,6 +1,6 @@
 export enum Region {
-  China = 'China',
-  World = 'World',
+  China = 'china',
+  World = 'world',
 }
 
 export enum PlatformType {
