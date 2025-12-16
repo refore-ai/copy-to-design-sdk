@@ -1,7 +1,10 @@
+/**
+ * @type {import('semantic-release').Options}
+ */
 export default {
   dryRun: false,
   debug: false,
-  branches: ['main'],
+  branches: ['main', { name: 'v2', prerelease: 'beta' }],
   plugins: [
     [
       './tools/semantic-release/commit-analyzer.js',
