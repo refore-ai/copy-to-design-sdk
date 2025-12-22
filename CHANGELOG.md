@@ -1,3 +1,34 @@
+## 2.0.0 (2025-12-22)
+
+* ci(package.json): add provenance flag to publishConfig ([4d9133a](https://github.com/refore-ai/copy-to-design-sdk/commit/4d9133a))
+* Feat: update authorization with accessToken and appId (#15) ([70ec865](https://github.com/refore-ai/copy-to-design-sdk/commit/70ec865)), closes [#15](https://github.com/refore-ai/copy-to-design-sdk/issues/15)
+* chore: add release workflow ([7f16e00](https://github.com/refore-ai/copy-to-design-sdk/commit/7f16e00))
+
+
+### BREAKING CHANGE
+
+* no more key
+
+* fix: update example with new sdk
+
+* chore: upgrade deps
+
+* fix: normalize region enum values to lowercase
+
+* refactor: rename endpoint to server
+
+* chore: move example/vue to example
+
+* fix: add getAuthorizationPayload comments
+
+* chore(release): add v2 branch with prerelease beta configuration
+
+* chore(release): 2.0.0-beta.1 [skip ci]
+
+* chore(release): update v2 branch release in beta tag
+
+* ci: update permissions to allow write access for contents
+
 ## 2.0.0-beta.1 (2025-12-16)
 
 * fix: add getAuthorizationPayload comments ([2fe0043](https://github.com/refore-ai/copy-to-design-sdk/commit/2fe0043))
