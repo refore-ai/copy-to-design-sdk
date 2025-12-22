@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { PlatformType } from '@refore-ai/copy-to-design-sdk';
+import { PlatformType, Region } from '@refore-ai/copy-to-design-sdk';
 
 import SuccessAnimation from '../animation/SuccessAnimation.vue';
 import type { ButtonOption } from '../selectable-button/types';
@@ -8,6 +8,7 @@ import { Dialog, DialogContent } from '../ui/dialog';
 import type { ExportContent } from './type';
 import { DESIGN_APPS } from './type';
 import { Button } from '../ui/button';
+import { createCopyToDesign } from './utils';
 
 const props = defineProps<{
   selectedOption: ButtonOption;
@@ -20,14 +21,8 @@ const emit = defineEmits<{
 
 const open = defineModel<boolean>('open');
 
-const API_KEY = import.meta.env.VITE_COPY_TO_DESIGN_KEY;
-const API_ENDPOINT = import.meta.env.VITE_COPY_TO_DESIGN_ENDPOINT
-  ? () => import.meta.env.VITE_COPY_TO_DESIGN_ENDPOINT
-  : undefined;
-
 const isExporting = ref(false);
 const exportStatus = ref<'success' | 'error' | 'waiting-user' | null>(null);
-const videoRef = ref<HTMLVideoElement>();
 const copyHandler = ref<Function | null>(null);
 
 const platform = computed(() => props.selectedOption.id as keyof typeof DESIGN_APPS);
@@ -57,12 +52,7 @@ const handleExport = async () => {
   exportStatus.value = null;
 
   try {
-    const { CopyToDesign } = await import('@refore-ai/copy-to-design-sdk');
-
-    const copyToDesign = new CopyToDesign({
-      key: API_KEY,
-      _endpoint: API_ENDPOINT,
-    });
+    const copyToDesign = await createCopyToDesign();
 
     await copyToDesign.copyPasteInPlugin({
       content: props.exportContent.html,
@@ -154,7 +144,7 @@ const openPluginPage = () => {
         </div>
       </div>
 
-      <div class="flex p-4 items-center justify-center text-center">
+      <div class="flex flex-col p-4 items-center justify-center text-center">
         <div v-if="exportStatus === 'success'">
           <SuccessAnimation message="Copying successful" />
           <div class="mt-3 whitespace-pre-line font-medium">

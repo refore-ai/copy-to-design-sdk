@@ -4,7 +4,7 @@ import { io } from 'socket.io-client';
 
 export interface IConnectionInfo {
   socket: Socket;
-  endpoint: string;
+  server: string;
   refCount: number;
   lastUsed: number;
 }
@@ -23,9 +23,7 @@ export interface IResourceSubscribeEvent<T> {
 }
 
 export interface ISocketAuthPayload {
-  type: string;
-  url: string;
-  key: string;
+  accessToken: string;
 }
 
 /**
@@ -40,10 +38,10 @@ export class SocketManager {
   }
 
   /**
-   * Get or create a socket connection for the given endpoint
+   * Get or create a socket connection for the given server
    */
-  async getOrCreateConnection(endpoint: string, authPayload: ISocketAuthPayload): Promise<Socket> {
-    const existing = this.connections.get(endpoint);
+  async getOrCreateConnection(server: string, authPayload: ISocketAuthPayload): Promise<Socket> {
+    const existing = this.connections.get(server);
 
     if (existing && existing.socket.connected) {
       existing.refCount++;
@@ -52,7 +50,7 @@ export class SocketManager {
     }
 
     // Create new connection
-    const socket = io(endpoint, {
+    const socket = io(server, {
       path: '/socket.io',
       transports: ['websocket'],
       auth: (cb) => {
@@ -83,20 +81,20 @@ export class SocketManager {
 
     const connectionInfo: IConnectionInfo = {
       socket,
-      endpoint,
+      server,
       refCount: 1,
       lastUsed: Date.now(),
     };
 
-    this.connections.set(endpoint, connectionInfo);
+    this.connections.set(server, connectionInfo);
     return socket;
   }
 
   /**
    * Release a connection reference
    */
-  releaseConnection(endpoint: string): void {
-    const connection = this.connections.get(endpoint);
+  releaseConnection(server: string): void {
+    const connection = this.connections.get(server);
     if (!connection) return;
 
     connection.refCount--;
@@ -107,10 +105,10 @@ export class SocketManager {
     if (connection.refCount <= 0) {
       // Set a timeout to disconnect idle connections
       setTimeout(() => {
-        const current = this.connections.get(endpoint);
+        const current = this.connections.get(server);
         if (current && current.refCount <= 0 && Date.now() - current.lastUsed > 30000) {
           current.socket.disconnect();
-          this.connections.delete(endpoint);
+          this.connections.delete(server);
         }
       }, 30000); // 30 seconds idle timeout
     }
@@ -175,7 +173,7 @@ export class SocketManager {
     this.activeSubscriptions.clear();
 
     // Disconnect all connections
-    for (const [_endpoint, connection] of this.connections) {
+    for (const [_server, connection] of this.connections) {
       connection.socket.disconnect();
     }
     this.connections.clear();

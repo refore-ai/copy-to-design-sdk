@@ -14,7 +14,13 @@ pnpm add @refore-ai/copy-to-design-sdk
 import { CopyToDesign, PlatformType, ImportMode } from '@refore-ai/copy-to-design-sdk';
 
 const copyToDesign = new CopyToDesign({
-  key: '<YOUR_KEY>',
+  region: Region.China, // or Region.World
+  getAuthorizationPayload: async () => {
+    return {
+      accessToken: '<YOUR_ACCESS_TOKEN>',
+      appId: '<YOUR_APP_ID>',
+    };
+  },
 });
 
 const firstPageHTML = `<!DOCTYPE html>
@@ -76,12 +82,12 @@ await copyToDesign.copyPasteInPlugin({
 
 Run vue example locally:
 
-1. copy ./example/vue/.env.sample to ./example/vue/.env
-2. replace <YOUR_KEY_HERE> in ./example/vue/.env
+1. copy ./example/.env.sample to ./example/.env
+2. replace `YOUR_ACCESS_TOKEN`, `YOUR_APP_ID` in ./example/.env
 3. run command:
 
 ```bash
 pnpm i
-pnpm vue-example:install # install dependencies for vue example in example/vue
-pnpm vue-example:dev # run vue example
+pnpm example:install # install dependencies
+pnpm example:dev # run vue example
 ```

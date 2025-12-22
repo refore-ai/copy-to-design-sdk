@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { ImportMode, PlatformType } from '@refore-ai/copy-to-design-sdk';
+import { ImportMode } from '@refore-ai/copy-to-design-sdk';
 import ToDesignApp from './components/copy-button/index.vue';
-import PreviewHtml from './components/preview/html.vue';
 import { Textarea } from './components/ui/textarea';
 import { Tabs, TabsList, TabsTrigger } from './components/ui/tabs';
 import { Button } from './components/ui/button';
@@ -119,7 +118,7 @@ const viewMode = ref('preview');
         </div>
 
         <div v-if="viewMode === 'preview'" class="h-full w-full p-4">
-          <PreviewHtml :code="active_input" class="w-full h-full" />
+          <iframe sandbox="allow-same-origin allow-scripts" class="w-full h-full" :srcdoc="active_input" />
         </div>
       </main>
     </div>

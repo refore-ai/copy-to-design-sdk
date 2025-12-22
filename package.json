@@ -1,7 +1,7 @@
 {
   "name": "@refore-ai/copy-to-design-sdk",
   "type": "module",
-  "version": "1.5.0",
+  "version": "2.0.0-beta.1",
   "packageManager": "pnpm@10.13.1+sha512.37ebf1a5c7a30d5fabe0c5df44ee8da4c965ca0c5af3dbab28c3a1681b70a256218d05c81c9c0dcf767ef6b8551eb5b960042b9ed4300c59242336377e01cfad",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -33,8 +33,8 @@
     "lint": "eslint src",
     "prepublishOnly": "pnpm run build",
     "release": "semantic-release --no-ci",
-    "vue-example:install": "pnpm --filter vue-example install",
-    "vue-example:dev": "pnpm --filter vue-example dev"
+    "example:install": "cd example && pnpm install",
+    "example:dev": "cd example && pnpm dev"
   },
   "publishConfig": {
     "access": "public",
@@ -48,10 +48,11 @@
   "dependencies": {
     "@thumbmarkjs/thumbmarkjs": "^1.2.0",
     "crypto-js": "^4.2.0",
-    "nanoid": "^5.1.5",
-    "ofetch": "^1.4.1",
-    "radashi": "^12.6.2",
-    "socket.io-client": "^4.8.1"
+    "nanoid": "^5.1.6",
+    "ofetch": "^1.5.1",
+    "radashi": "^12.7.1",
+    "socket.io-client": "^4.8.1",
+    "type-fest": "^5.3.1"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^5.2.1",
@@ -66,17 +67,17 @@
     "@types/node": "20.19.8",
     "commitizen": "^4.3.1",
     "cz-conventional-changelog": "^3.3.0",
-    "eslint": "^9.34.0",
+    "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "husky": "^9.1.7",
     "is-ci": "^4.1.0",
-    "lint-staged": "^16.1.6",
-    "minimatch": "^10.0.3",
-    "prettier": "^3.6.2",
+    "lint-staged": "^16.2.7",
+    "minimatch": "^10.1.1",
+    "prettier": "^3.7.4",
     "semantic-release": "^25.0.2",
-    "tsdown": "^0.14.2",
-    "tsx": "^4.20.5",
-    "typescript": "^5.9.2"
+    "tsdown": "^0.17.4",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
   }
 }

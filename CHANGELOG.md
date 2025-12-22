@@ -1,3 +1,17 @@
+## 2.0.0-beta.1 (2025-12-16)
+
+* fix: add getAuthorizationPayload comments ([2fe0043](https://github.com/refore-ai/copy-to-design-sdk/commit/2fe0043))
+* fix: normalize region enum values to lowercase ([ec5a10a](https://github.com/refore-ai/copy-to-design-sdk/commit/ec5a10a))
+* chore: move example/vue to example ([5bbba2e](https://github.com/refore-ai/copy-to-design-sdk/commit/5bbba2e))
+* chore: upgrade deps ([fdbdb7f](https://github.com/refore-ai/copy-to-design-sdk/commit/fdbdb7f))
+* refactor: rename endpoint to server ([bb7b1b3](https://github.com/refore-ai/copy-to-design-sdk/commit/bb7b1b3))
+* feat: use accessToken and appId instead of key as authorization, need user set region manually ([8b653fe](https://github.com/refore-ai/copy-to-design-sdk/commit/8b653fe))
+
+
+### BREAKING CHANGE
+
+* no more key
+
 ## 1.5.0 (2025-11-07)
 
 * feat: support customize top layer name referrer part ([e4a4b8a](https://github.com/refore-ai/copy-to-design-sdk/commit/e4a4b8a))
