@@ -51,6 +51,17 @@ alert(
 
 ## API Reference
 
+### new CopyToDesign(options)
+
+Creates a new `CopyToDesign` instance.
+
+#### Options
+
+| Parameter | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `region` | `Region` | Yes | - | The server region. `Region.China` for servers in China, `Region.World` for servers in other regions. |
+| `getAuthorizationPayload` | `() => Promisable<{ accessToken: string, appId: string }>` | Yes | - | A function that returns an object containing the `accessToken` and `appId`. This function is called before each network request to get the latest authorization info. |
+
 ### copyPasteInPlugin(options)
 
 Copies HTML content to clipboard in a format that can be pasted into design tools.
@@ -65,6 +76,28 @@ Copies HTML content to clipboard in a format that can be pasted into design tool
 | `height` | `number` | No | - | Height of the page viewport in pixels. |
 | `importMode` | `ImportMode` | No | `ImportMode.Interactive` | Import mode. One of: `ImportMode.Interactive` (user can adjust import settings), `ImportMode.Quick` (direct import) |
 | `topLayerName.referrer` | `false \| string` | No | `location.origin` | Imported page's top layer name's referrer part |
+
+### copyPasteDirect(options)
+
+Copies HTML content to the clipboard for direct pasting into MasterGo. This method provides a more seamless experience for MasterGo users.
+
+#### Options
+
+The options for `copyPasteDirect` are the same as `copyPasteInPlugin`, with the following differences:
+
+- `platform` must be `PlatformType.MasterGo`.
+- `importMode` is not applicable and will be ignored.
+
+#### Example
+
+```typescript
+await copyToDesign.copyPasteDirect({
+  content: htmlString,
+  platform: PlatformType.MasterGo,
+  width: 1920,
+  height: 1080,
+});
+```
 
 #### Example
 

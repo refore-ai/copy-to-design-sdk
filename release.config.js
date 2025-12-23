@@ -4,7 +4,7 @@
 export default {
   dryRun: false,
   debug: false,
-  branches: ['main', { name: 'v2', channel: 'beta', prerelease: 'beta' }],
+  branches: ['main'],
   plugins: [
     [
       './tools/semantic-release/commit-analyzer.js',
@@ -24,7 +24,12 @@ export default {
         changelogFile: 'CHANGELOG.md',
       },
     ],
-    '@semantic-release/npm',
+    [
+      '@semantic-release/npm',
+      {
+        npmPublish: false,
+      },
+    ],
     [
       '@semantic-release/git',
       {
